@@ -1,0 +1,12 @@
+---
+Name: EveryDataStorerootroute
+After:
+    - '#rootroutes'
+    - '#coreroutes'
+---
+SilverStripe\Control\Director:
+  rules:
+    '': 'EveryDataStore\Control\EveryDataStoreController'
+
+
+

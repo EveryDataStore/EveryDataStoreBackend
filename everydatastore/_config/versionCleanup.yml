@@ -1,0 +1,24 @@
+EveryDataStore\Model\RecordSet\RecordSet:
+    keep_versions: 3
+    keep_drafts: 3
+EveryDataStore\Model\RecordSet\RecordSetItem:
+    keep_versions: 3
+    keep_drafts: 3
+EveryDataStore\Model\RecordSet\RecordSetItemData:
+    keep_versions: 3
+    keep_drafts: 3
+EveryDataStore\Model\RecordSet\Form\Form:
+    keep_versions: 3
+    keep_drafts: 3
+EveryDataStore\Model\RecordSet\Form\FormSection:
+    keep_versions: 3
+    keep_drafts: 3
+EveryDataStore\Model\RecordSet\Form\FormSectionColumn:
+    keep_versions: 3
+    keep_drafts: 3
+EveryDataStore\Model\RecordSet\Form\FormField:
+    keep_versions: 3
+    keep_drafts: 3
+EveryDataStore\Model\RecordSet\Form\FormFieldSetting:
+    keep_versions: 3
+    keep_drafts: 3

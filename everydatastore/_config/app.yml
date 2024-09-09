@@ -1,0 +1,28 @@
+SilverStripe\Security\Member:
+  extensions:
+    - EveryDataStore\Extension\MemberExtension
+
+SilverStripe\Assets\File:
+  extensions:
+    - EveryDataStore\Extension\FileExtension
+
+SilverStripe\Security\Group:
+  extensions:
+    - EveryDataStore\Extension\GroupExtension
+
+Silverstripe\SiteConfig\SiteConfig:
+  extensions:
+    - EveryDataStore\Extension\SiteConfigExtension
+
+SilverStripe\Security\Permission:
+  extensions:
+    - EveryDataStore\Extension\PermissionExtension
+
+EveryDataStore\Model\RecordSet\RecordSet:
+  extensions:
+    - SilverStripe\Versioned\Versioned
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\Assets\Storage\ProtectedFileController:
+    class: EveryDataStore\Control\EveryDataStoreProtectedFileController
+  Axllent\VersionTruncator\Tasks\TruncateVersionsTask:
+    class: EveryDataStore\Extension\TruncateVersionsTaskExtension

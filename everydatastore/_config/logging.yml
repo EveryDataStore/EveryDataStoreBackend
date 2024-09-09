@@ -1,0 +1,17 @@
+---
+Name: everydatastore-logging
+---
+SilverStripe\Core\Injector\Injector:
+  Psr\Log\LoggerInterface:
+    calls:
+      MailHandler: [ pushHandler, [ '%$MailHandler' ] ]
+  MailHandler:
+      class: Monolog\Handler\NativeMailerHandler
+      constructor:
+        - email@exsample com
+        - There was an error on your test site
+        - email@exsample com
+        - error
+      properties:
+        ContentType: text/html
+        Formatter: '%$SilverStripe\Logging\DetailedErrorFormatter'

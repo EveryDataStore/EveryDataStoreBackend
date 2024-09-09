@@ -1,0 +1,131 @@
+SilverStripe\Security\Member:
+    Admin:
+        FirstName: Test
+        Surname: Administrator
+    AppManager:
+        FirstName: Test
+        Surname: AppManager
+    Staff:
+        FirstName: Test
+        Surname: Staff
+        
+SilverStripe\Security\Group:
+  Administrators:
+    Title: Administrators
+    Code: ADMIN
+    Members:
+      - =>SilverStripe\Security\Member.Admin
+  AppManager:
+    Title: AppManager
+    Code: APPMANAGER
+    Members:
+      - =>SilverStripe\Security\Member.AppManager
+  Staff:
+    Title: Staff
+    Code: STAFF
+    Members:
+      - =>SilverStripe\Security\Member.Staff
+      
+SilverStripe\Security\Permission:
+    FirstObj:
+        Code: CREATE
+        Group: =>SilverStripe\Security\Group.AppManager
+    SecondObj:
+        Code: EDIT
+        Group: =>SilverStripe\Security\Group.AppManager
+    ThirdObj:
+        Code: DELETE
+        Group: =>SilverStripe\Security\Group.AppManager
+    FourthObj:
+        Code: VIEW
+        Group: =>SilverStripe\Security\Group.Staff
+EveryDataStore\Model\DataStore:
+    FirstObj:
+        Active: true
+        Title: DataStore1
+        StorageAllowedSize: 550000
+        StorageCurrentSize: 0
+        UploadAllowedExtensions: '["jpeg","jpg","pdf","png"]'
+EveryDataStore\Model\EveryConfiguration:
+    FirstObj:
+        Title: My Title
+        Value: My Value
+        DataStoreID:  =>EveryDataStore\Model\DataStore.FirstObj
+EveryDataStore\Model\Menu:
+    FirstObj:
+        Title: My Menu
+        Active: true
+        AdminMenu: 0
+        UserMenu: 0
+        Controller: 
+        Icon: fa fa-percent
+        ParentID: 0
+        DataStoreID:  =>EveryDataStore\Model\DataStore.FirstObj
+    SecondObj:
+        Title: My Menu 2
+        Active: true
+        AdminMenu: 0
+        UserMenu: 0
+        Controller: record
+        Action: items
+        ActionID: RecordSet Slug
+        ActionOtherID: some other id
+        Icon: fa fa-user
+        ParentID:  =>EveryDataStore\Model\Menu.FirstObj
+        BadgeEndpoint: restful/custom/CustomFnc/CountItems
+        DataStoreID:  =>EveryDataStore\Model\DataStore.FirstObj
+EveryDataStore\Model\RecordSet\RecordSet:
+    FirstObj:
+        Active: true
+        Title: My Record
+        ShowInMenu: True
+        AllowUpload: true
+        FrontendTapedForm: false
+        OpenFormInDialog: false
+        DataStoreID:  =>EveryDataStore\Model\DataStore.FirstObj
+EveryDataStore\Model\RecordSet\Form:
+    FirstObj:
+        Slug: MyForm
+        RecordSetID: =>EveryDataStore\Model\RecordSet\RecordSet.FirstObj
+EveryDataStore\Model\RecordSet\FormSection:
+    FirstObj:
+        Slug: MyFormSection
+        FormID: =>EveryDataStore\Model\RecordSet\Form.FirstObj
+EveryDataStore\Model\RecordSet\FormSectionColumn:
+    FirstObj:
+        Slug: MyFormSectionColumn
+        SectionID: =>EveryDataStore\Model\RecordSet\FormSection.FirstObj
+EveryDataStore\Model\RecordSet\RecordSetItem:
+    FirstObj:
+        DeletionDate: null
+        DeletionType: null
+        RecordSetID: =>EveryDataStore\Model\RecordSet\RecordSet.FirstObj
+EveryDataStore\Model\RecordSet\RecordSetItemData:
+    FirstObj:
+        Value: My Value
+        RecordSetItemID: =>EveryDataStore\Model\RecordSet\RecordSetItem.FirstObj
+EveryDataStore\Model\RecordSet\Form\FormField:
+    FirstObj:
+        Sort: 1
+        ColumnID: =>EveryDataStore\Model\RecordSet\FormSectionColumn.FirstObj
+EveryDataStore\Model\RecordSet\Form\FormFieldSetting:
+    FirstObj:
+        Title: active
+        Value: 'true'
+        FormFieldID: =>EveryDataStore\Model\RecordSet\Form\FormField.FirstObj
+    SecondObj:
+        Title: label
+        Value: My Label
+        FormFieldID: =>EveryDataStore\Model\RecordSet\Form\FormField.FirstObj
+    ThirdObj:
+        Title: type
+        Value: text
+        FormFieldID: =>EveryDataStore\Model\RecordSet\Form\FormField.FirstObj
+    FourthObj:
+        Title: type
+        Value: text
+        FormFieldID: =>EveryDataStore\Model\RecordSet\Form\FormField.FirstObj
+EveryDataStore\Model\Note:
+    FirstObj:
+        Content: My Content
+        RecordSetItemID: =>EveryDataStore\Model\RecordSet\RecordSetItem.FirstObj

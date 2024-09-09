@@ -1,0 +1,68 @@
+SilverStripe\ORM\DataObject:
+    Object_Slug_Length: 20
+SilverStripe\i18n\i18n:
+  default_locale: 'en_US'
+Frontend_Languages:
+    en_US: 'English US'
+    de_DE: 'Deutsch'
+    ar_EG: 'Arabic'
+SilverStripe\Assets\File:
+    # Directory name in assets folder
+    root_dir_name: 'everydatastore'
+    allowed_extensions:
+        - json
+    not_allowed_extensions:
+    not_allowed_extension_categories:
+        - audion
+        - video
+Frontend_Themes:
+    blue: 'Blue'
+    bluegrey: 'Blue Grey'
+    brown: 'Brown'
+    cyan: 'Cyan'
+    deeporange: 'Deep Orange'
+    deeppurple: 'Deep Purple'
+    green: 'Green'
+    indigo: 'Indigo'
+    lime: 'Lime'
+    magenta: 'Magenta'
+    orange: 'Orange'
+    pink: 'Pink'
+    purple: 'Purple'
+    rose: 'Rose'
+    teal: 'Teal'
+number_format:
+    decimal: 2
+    decimal_separator: ','
+    thousand_separator: '.'
+default_member:
+    email: 'member@everydatastore.com'
+    password: 'mypassword'
+asset_viewer_member:
+    email: 'viewer@everydatastore.com'
+    password: 'mypassword'
+cron_member:
+    email: 'cron@everydatastore.com'
+    password: 'mypassword'
+# SilverStripe Admin-E-Mail
+SilverStripe\Control\Email\Email:
+  admin_email: 'admin@everydatastore.com'
+# defines the life time of a recordset item in seconds
+draft_recordset_item_life_time: 11
+demo_data_file_path: 'your_project_director/everydatastore/demodata/demo.json'
+everydatastore_tmp_dir_path: 'your_project_director/tmp'
+
+#Cors Config
+cors_config:
+    Allow-Domains: '*'
+    Allow-Methods:  'GET,POST,OPTIONS,DELETE,PUT'
+    Allow-Headers: 'X-Requested-With,Authorization,Content-Type'
+    Max-Age: 600 #10 Minutes
+ 
+#Client IP Config
+client_ip:
+    whitelist: '*'
+    blacklist: ''
+    #Example, every ip must be separated by , (comma). * = wildcard
+    #whitelist: 'xx.xxx.xx.xxx,xx.xxx.xx.*'
+    #blacklist: 'yy.yyy.yy.yyy,yy.yyy.yy.*'

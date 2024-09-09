@@ -1,0 +1,15 @@
+#Required SwiftMailer PHP library
+---
+Name: EveryDataStoreEmailConfig
+After:
+  - '#emailconfig'
+---
+SilverStripe\Core\Injector\Injector:
+  Swift_Transport:
+    class: Swift_SmtpTransport
+    properties:
+      Host: mail.everydatastore.com
+    calls:
+      Username: [ setUsername, ['mail@everydatastore.com'] ]
+      Password: [ setPassword, ['*******'] ]
+      AuthMode: [ setAuthMode, ['login'] ]

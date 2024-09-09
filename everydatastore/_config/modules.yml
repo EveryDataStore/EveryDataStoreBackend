@@ -1,0 +1,8 @@
+Name: modules-everydatastore
+After:
+  - '#modules-framework'
+---
+SilverStripe\Core\Manifest\ModuleManifest:
+  project: everydatastore
+  module_priority:
+    - everydatastore
