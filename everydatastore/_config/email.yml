@@ -8,8 +8,8 @@ SilverStripe\Core\Injector\Injector:
   Swift_Transport:
     class: Swift_SmtpTransport
     properties:
-      Host: mail.everydatastore.com
+      Host: mail.example.com
     calls:
-      Username: [ setUsername, ['mail@everydatastore.com'] ]
+      Username: [ setUsername, ['mail@example.com'] ]
       Password: [ setPassword, ['*******'] ]
       AuthMode: [ setAuthMode, ['login'] ]
