@@ -73,7 +73,9 @@ class RecordSetItemData extends DataObject {
     }
 
     public function Value() {
+   
     if($this->Value || $this->FolderID > 0){
+
       $retValue = $this->Value;
       $textFieldType = $this->FormField()->getTextFieldType();
 
@@ -126,6 +128,9 @@ class RecordSetItemData extends DataObject {
             return RecordSetItemDataHelper::getRelationFieldValue($this);
         }
         
+        if(is_array(unserialize($this->Value))){
+            $retValue = unserialize($this->Value);
+        }
         return  $retValue;
       }
     }

@@ -168,7 +168,6 @@ class MemberExtension extends DataExtension implements PermissionProvider {
         }
 
         $Avatar = UploadField::create('Avatar', _t($this->owner->ClassName . '.AVATAR', 'Avatars'));
-        //$Avatar->setAllowedExtensions(['png,jpg,jpeg']);
         $Avatar->setAllowedMaxFileNumber(1);
         $fields->addFieldToTab('Root.' . _t('Global.AVATAR', 'Avatar'), $Avatar, 'Active');
 

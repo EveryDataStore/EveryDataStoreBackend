@@ -210,7 +210,7 @@ class RecordSet extends DataObject implements PermissionProvider {
     public function getRecordResultlistFields($getAll = False) {
         $ids = $this->getRecordResultlistFormFieldIDs($getAll);
         if ($ids) {
-            return FormField::get()->filter(array('ID' => $ids));
+            return FormField::get()->filter(array('ID' => $ids))->Sort('Column.Section.Sort ASC,Column.Sort ASC, Sort ASC');
         }
 
     }
@@ -222,13 +222,13 @@ class RecordSet extends DataObject implements PermissionProvider {
                 if ($section->Columns()) {
                     foreach ($section->Columns() as $column) {
                         if ($column->FormFields()) {
-                            foreach ($column->FormFields()->Sort('Column.Section.Sort', 'ASC') as $FormField) {
+                            foreach ($column->FormFields()->Sort("Sort ASC") as $FormField) {
                                 if ($getAll == true) {
-                                    if ($FormField->getActive() && $FormField->ID) {
+                                    if ($FormField->getActive()) {
                                         array_push($ids, $FormField->ID);
                                     }
                                 } else {
-                                    if ($FormField->getActive() && $FormField->showInResultlist() && $FormField->ID) {
+                                    if ($FormField->getActive() && $FormField->showInResultlist()) {
                                         array_push($ids, $FormField->ID);
                                     }
                                 }
@@ -257,7 +257,7 @@ class RecordSet extends DataObject implements PermissionProvider {
         return $this->getRecordResultlistFieldsToArray($getAll = false);
     }
 
-    public function getRecordResultlistFieldsToArray($getAll = false) {
+    public function getRecordResultlistFieldsToArray($getAll = false, $sort = false) {
         $fields = [];
         if (!empty($this->getRecordResultlistFields($getAll))) {
             foreach ($this->getRecordResultlistFields($getAll) as $field) {
@@ -270,7 +270,7 @@ class RecordSet extends DataObject implements PermissionProvider {
             }
         }
 
-        EveryDataStoreHelper::array_sort_by_column($fields, 'Label');
+        if($sort) EveryDataStoreHelper::array_sort_by_column($fields, 'Label');
         return $fields;
     }
 

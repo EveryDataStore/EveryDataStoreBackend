@@ -32,41 +32,48 @@ class AssetHelper extends EveryDataStoreHelper {
     public static function createFolder($folderName, $parentFolder = null) {
         $member = self::getMember();
         if ($member) {
-            $Folder = $parentFolder ? Folder::find_or_make(strtolower($parentFolder->Filename . '/' . $folderName)) : Folder::find_or_make(strtolower($folderName));
-            if ($Folder) {
-                $AdministratorsGroup = Group::get()->filter(array('Title' => 'Administrators'))->First();
-                $editorGroups = $member->CurrentDataStore()->Groups()->filter(array(
+            $folder = $parentFolder ? Folder::find_or_make(strtolower($parentFolder->Filename . '/' . $folderName)) : Folder::find_or_make(strtolower($folderName));
+            if ($folder) {
+                self::setAssetPermissions($folder);
+                return $folder;
+            }
+        }
+    }
+    
+    /**
+     * Sets permissions for folder
+     * @param DataObject $folder
+     */
+    public static function setAssetPermissions($asset){
+        $administratorsGroup = Group::get()->filter(array('Title' => 'Administrators'))->First();
+                $editorGroups = self::getCurrentDataStore()->Groups()->filter(array(
                     'Permissions.Code' => array('CREATE_FILE', 'EDIT_FILE', 'VIEW_FILE', 'DELETE_FILE')
                 ));
 
                 if ($editorGroups) {
-                    $Folder->CanEditType = 'OnlyTheseUsers';
+                    $asset->CanEditType = 'OnlyTheseUsers';
                     foreach ($editorGroups as $editorGroup) {
-                        $Folder->EditorGroups()->add($editorGroup);
+                        $asset->EditorGroups()->add($editorGroup);
                     }
                 }
 
-                $viewerGroups = $member->CurrentDataStore()->Groups()->filter(array(
+                $viewerGroups =  self::getCurrentDataStore()->Groups()->filter(array(
                     'Permissions.Code' => array('VIEW_FILE')
                 ));
 
                 if ($viewerGroups) {
-                    $Folder->CanViewType = 'OnlyTheseUsers';
+                    $asset->CanViewType = 'OnlyTheseUsers';
                     foreach ($viewerGroups as $viewerGroup) {
-                        $Folder->ViewerGroups()->add($viewerGroup);
+                        $asset->ViewerGroups()->add($viewerGroup);
                     }
                 }
 
-                if ($AdministratorsGroup) {
-                    $Folder->EditorGroups()->add($AdministratorsGroup);
-                    $Folder->ViewerGroups()->add($AdministratorsGroup);
+                if ($administratorsGroup) {
+                    $asset->EditorGroups()->add($administratorsGroup);
+                    $asset->ViewerGroups()->add($administratorsGroup);
                 }
-
-                return $Folder;
-            }
-        }
     }
-
+    
     /**
      * This function inspects if folder exists
      * @param integer $folderID
@@ -167,6 +174,7 @@ class AssetHelper extends EveryDataStoreHelper {
         $fileObject->publishSingle();
         return $fileObject;
     }
+
 
 
     /**

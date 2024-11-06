@@ -235,7 +235,7 @@ class DataStore extends DataObject implements PermissionProvider {
         $allowedFileExtensions =  explode(',', str_replace(['[',']', '"'], '', $this->UploadAllowedExtensions));
         if($allowedFileExtensions){
             foreach($allowedFileExtensions as $ext){
-               $ret[] = ['Label' => strtoupper($ext), 'value' => '.'.$ext];
+               $ret[] = ['label' => strtoupper($ext), 'value' => '.'.$ext];
             }
         }
         return $ret;
@@ -409,6 +409,7 @@ class DataStore extends DataObject implements PermissionProvider {
         $defaultConfig = [
             'DateFormat' => 'd.m.Y',
             'DateTimeFormat' => 'd.m.Y H:i:s',
+            'Timezone' => 'Europe/Berlin',
             'TimeFormat' => 'H:i:s',
             'ItemsPerPage' => 10,
             'MenuBadgeUpdateInterval' => 50000, // Milliseconds

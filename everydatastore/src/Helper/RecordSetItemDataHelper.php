@@ -5,6 +5,7 @@ namespace EveryDataStore\Helper;
 use EveryDataStore\Helper\EveryDataStoreHelper;
 use EveryDataStore\Model\RecordSet\RecordSetItem;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\Assets\Folder;
 
 /** EveryDataStore v1.0
  *
@@ -20,8 +21,9 @@ class RecordSetItemDataHelper extends EveryDataStoreHelper {
      */
     public static function getUploadFieldValue($recordSetItemData) {
         $ret = [];
-        $folderChilds = Versioned::get_by_stage('SilverStripe\Assets\Folder', Versioned::LIVE)->filter(['ParentID' => $recordSetItemData->FolderID])->sort("ID ASC");
-        foreach ($folderChilds as $folder) {
+        //$folderChilds = Versioned::get_by_stage('SilverStripe\Assets\Folder', Versioned::LIVE)->filter(['ParentID' => $recordSetItemData->FolderID])->sort("ID ASC");
+ 
+        foreach ($recordSetItemData->Folder()->Children() as $folder) {
             foreach ($folder->Children() as $child) {
                 if ($child->ClassName !== 'SilverStripe\Assets\Folder'){
                     $ret[] = array(
@@ -35,6 +37,7 @@ class RecordSetItemDataHelper extends EveryDataStoreHelper {
                 }
             }
         }
+
         return $ret;
     }
 

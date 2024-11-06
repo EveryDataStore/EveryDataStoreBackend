@@ -5,7 +5,7 @@ public/assets/*
 !public/assets/.protected/.gitkeep
 !public/assets/.protected/.htaccess
 !public/assets/.htaccess
-public/_resources/vendor/
+public/_resources/*
 .env
 tmp/*
 !tmp/.gitkeep
@@ -14,5 +14,3 @@ silverstripe-cache/*
 .DS_Store
 .gitmodules
 nbproject/
-
-
