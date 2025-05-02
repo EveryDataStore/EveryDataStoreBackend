@@ -17,8 +17,9 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Config\Config;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines a RecordSetItem, its structure in the database,
  * as well as its relations to other models.
@@ -118,6 +119,11 @@ class RecordSetItem extends DataObject implements PermissionProvider {
 
     public function onAfterWrite() {
         parent::onAfterWrite();
+        $mapRecordSetItemWithFileConfig = Config::inst()->get('EveryDataStore\Model\RecordSet\RecordSetItem', 'MapRecordSets');
+        if($this->ItemData()->Count() > 0 && $mapRecordSetItemWithFileConfig && array_key_exists($this->RecordSet()->Slug, $mapRecordSetItemWithFileConfig)){
+            RecordSetItemHelper::mapRecordSetItemFieldsWithFileFields($this, $mapRecordSetItemWithFileConfig[$this->RecordSet()->Slug]);
+        }
+        
     }
 
     public function onBeforeDelete() {
@@ -126,6 +132,7 @@ class RecordSetItem extends DataObject implements PermissionProvider {
     }
 
     public function onAfterDelete() {
+        parent::onAfterDelete();
         if ($this->ItemData()->Count() > 0) {
             EveryDataStoreHelper::deleteDataObjects($this->ItemData());
         }
@@ -135,7 +142,8 @@ class RecordSetItem extends DataObject implements PermissionProvider {
         }
 
         if ($this->Folder() && $this->FolderID > 0) {
-            //$this->Folder()->delete();
+            AssetHelper::deleteFolder($this->FolderID);
+            $this->FolderID = 0;
         }
 
         if ($this->RecordItems()->Count() > 0) {
@@ -143,7 +151,7 @@ class RecordSetItem extends DataObject implements PermissionProvider {
         }
 
         EveryDataStoreHelper::deleteAllVersions($this->ID, self::$table_name);
-        parent::onAfterDelete();
+        
     }
 
     /**
@@ -260,6 +268,14 @@ class RecordSetItem extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do the given action
      */
     public function canView($member = null) {
+       if($this->RecordSet()->Groups()->Count() > 0 && !RecordSetItemHelper::isMemberInGroups($this->RecordSet()->Groups())){
+            return false;
+        }
+        
+        if(!RecordSetItemHelper::canDoCreatedBy($this, $member)){
+            return false;
+        }
+        
         return RecordSetItemHelper::checkPermission(RecordSetItemHelper::getNicePermissionCode("VIEW", $this), $member);
     }
 
@@ -270,6 +286,14 @@ class RecordSetItem extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do the given action
      */
     public function canEdit($member = null) {
+        if($this->RecordSet()->Groups()->Count() > 0 && !RecordSetItemHelper::isMemberInGroups($this->RecordSet()->Groups())){
+            return false;
+        }
+        
+        if(!RecordSetItemHelper::canDoCreatedBy($this, $member)){
+            return false;
+        }
+        
         return RecordSetItemHelper::checkPermission(RecordSetItemHelper::getNicePermissionCode("EDIT", $this), $member);
     }
 
@@ -280,6 +304,14 @@ class RecordSetItem extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do the given action
      */
     public function canDelete($member = null) {
+        if($this->RecordSet()->Groups()->Count() > 0 && !RecordSetItemHelper::isMemberInGroups($this->RecordSet()->Groups())){
+            return false;
+        }
+        
+        if(!RecordSetItemHelper::canDoCreatedBy($this, $member)){
+            return false;
+        }
+        
         return RecordSetItemHelper::checkPermission(RecordSetItemHelper::getNicePermissionCode("DELETE", $this), $member);
     }
 
@@ -291,10 +323,12 @@ class RecordSetItem extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do this action
      */
     public function canCreate($member = null, $context = []) {
-        if (RecordSetItemHelper::getCurrentDataStoreRecordSetItemsCount() < RecordSetItemHelper::getCurrentDataStore()->RecordSetItemAllowedNumber) {
-            return RecordSetItemHelper::checkPermission(RecordSetItemHelper::getNicePermissionCode("CREATE", $this), $member);
+        if($this->RecordSet()->Groups()->Count() > 0 && !RecordSetItemHelper::isMemberInGroups($this->RecordSet()->Groups())){
+            return false;
         }
-        return false;
+        
+        return RecordSetItemHelper::checkPermission(RecordSetItemHelper::getNicePermissionCode("CREATE", $this), $member);
+
     }
 
 

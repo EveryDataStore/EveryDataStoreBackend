@@ -11,7 +11,7 @@ use EveryDataStore\Model\RecordSet\RecordSetItemData;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines a FormField, i.e., a field that can be found on the form (RecordForm) of a specific RecordSetItem,
  * as well as its relations to other models.

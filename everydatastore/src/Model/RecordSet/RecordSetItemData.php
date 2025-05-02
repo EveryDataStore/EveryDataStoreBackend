@@ -3,6 +3,8 @@
 namespace EveryDataStore\Model\RecordSet;
 
 use EveryDataStore\Helper\EveryDataStoreHelper;
+use EveryTranslator\Helper\EveryTranslatorHelper;
+use EveryDataStore\Helper\LoggerHelper;
 use EveryDataStore\Helper\RecordSetItemDataHelper;
 use EveryDataStore\Helper\AssetHelper;
 use EveryDataStore\Model\RecordSet\RecordSetItem;
@@ -11,7 +13,8 @@ use SilverStripe\Assets\Folder;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 
-/** EveryDataStore v1.0
+
+/** EveryDataStore v1.5
  *
  * This class defines a RecordSetItemData, i.e., data that belongs to a specific RecordSetItem,
  * as well as its relations to other models.
@@ -99,11 +102,13 @@ class RecordSetItemData extends DataObject {
                 $suffixValue = ' '.$this->FormField()->Settings()->Filter(['Title' => 'currency'])->first()->Value;
             }
             
+            
             $niceNumber = $prefixValue.RecordSetItemDataHelper::getNiceNumberFormat($this->Value).$suffixValue;
             return $niceNumber;
         }
                 
-         // check if value a datefield
+        // check if value a datefield
+        /*
         if($this->FormField()->getTypeSlug() == 'textfield'){
 
             $type = RecordSetItemDataHelper::getFormFieldSetting($this->FormField()->Settings(), 'type');
@@ -114,9 +119,9 @@ class RecordSetItemData extends DataObject {
                 }
 
                $retValue = $format ? date_format(date_create($this->Value), $format) : $retValue;
-               
             }
         }
+        */
         
         
         if($this->FolderID > 0 &&  $this->FormField()->getTypeSlug() == 'uploadfield'){
@@ -131,6 +136,11 @@ class RecordSetItemData extends DataObject {
         if(is_array(unserialize($this->Value))){
             $retValue = unserialize($this->Value);
         }
+        
+        if(EveryTranslatorHelper::isTranslatableRecordSet($this->RecordSetItem()->RecordSet()->Slug)){
+            $retValue = EveryTranslatorHelper::_t($retValue, true);
+        }
+        
         return  $retValue;
       }
     }
@@ -145,9 +155,12 @@ class RecordSetItemData extends DataObject {
             $parentFolder = $this->RecordSetItem()->Folder();
             $createdFiles = [];
             if(!AssetHelper::isFolderExists($this->RecordSetItem()->FolderID)){
+                        $recordSetItemFolder = AssetHelper::createFolder($this->RecordSetItem()->Slug, $this->RecordSetItem()->RecordSet()->Folder());
+                        $this->RecordSetItem()->FolderID = $recordSetItemFolder->ID;
                         $this->RecordSetItem()->writeWithoutVersion();
+                        $parentFolder = $recordSetItemFolder;
             }
-            $this->FolderID  =   AssetHelper::createFolder($this->Label(), $this->RecordSetItem()->Folder())->ID;
+            $this->FolderID  =   AssetHelper::createFolder($this->Label(), $parentFolder)->ID;
             if ($this->Value && is_array(unserialize($this->Value))) {
                 foreach (unserialize($this->Value) as $v) {
                     $filename = AssetHelper::getAvailableAssetName('SilverStripe\Assets\Folder', 10);
@@ -156,10 +169,21 @@ class RecordSetItemData extends DataObject {
             }
             $this->Value = '';
         }
-
+        
+        /*
+        if($this->FormField()->getTextFieldType() == 'time'){
+            $this->Value = date('H:i:s', strtotime($this->Value));
+        }
+        
+        if($this->FormField()->getTextFieldType() == 'datetime'){
+            $this->Value = date('Y-m-d H:i:s', strtotime($this->Value));
+        }
+       */
         if (is_array($this->Value)) {
             $this->Value = serialize($this->Value);
         }
+        
+        
     }
 
     public function onAfterWrite() {
@@ -174,7 +198,8 @@ class RecordSetItemData extends DataObject {
     public function onAfterDelete() {
         parent::onAfterDelete();
         if ($this->Folder() && $this->FolderID > 0) {
-             $this->Folder()->delete();
+            AssetHelper::deleteFolder($this->FolderID);
+            $this->FolderID = 0;
         }
         EveryDataStoreHelper::deleteAllVersions($this->ID, self::$table_name);
     }

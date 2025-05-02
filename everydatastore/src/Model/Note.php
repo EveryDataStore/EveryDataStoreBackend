@@ -11,7 +11,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Core\ClassInfo;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines a Note model, its structure in the database and its relations.
  * User permissions regarding this class are also defined here.

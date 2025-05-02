@@ -15,6 +15,7 @@ en:
         LASTEDITED: 'Last edited'
         CREATEDBY: 'Created By'
         UPDATEDBY: 'Updated By'
+        NOPERMISSION: 'You do not have permission to perform this action {action}'
     EveryDataStore\Model\DataStore:
         MAIN: 'Main'
         TITLE: 'Title'
@@ -37,6 +38,7 @@ en:
         PRICE: 'Price'
         INSTALLED: 'Installed'
         ICON: 'Icon'
+        MOBILEAPPICON: 'Mobile App Icon'
         DISPLAYPRICE: 'Price'
     EveryDataStore\Model\Menu:
         TITLE: 'Title'

@@ -6,7 +6,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\CheckboxField;
 
-/** EveryDataStore/EveryDataStore v1.0
+/** EveryDataStore/EveryDataStore v1.5
  *
  * This extension overwrites some methods of the File SiteConfig
  * It provides modifications to the form in the CMS

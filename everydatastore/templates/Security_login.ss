@@ -29,7 +29,7 @@
                     <div class="col-xxl-12 col-xl-12 col-lg-12 col-md-12 col-12">
                         <div class="login-box login-sidebar">
                             <div class="white-box">
-                                <div class="text-center m-b-15">
+                                <div class="text-center m-b-25">
                                     <a href="{$BaseHref}/Security/login?BackURL={$BaseHref}/" class="text-center db"><img class="w-100" src="{$BaseHref}/_resources/everydatastore/assets/img/logo.png" alt="Home2"></a>
                                 </div>
                                 <% if $Content %>

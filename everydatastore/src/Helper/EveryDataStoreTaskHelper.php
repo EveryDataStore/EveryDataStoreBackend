@@ -2,9 +2,6 @@
 namespace EveryDataStore\Helper;
 
 use EveryDataStore\Helper\EveryDataStoreHelper;
-use SilverStripe\ORM\Queries\SQLSelect;
-use SilverStripe\ORM\Queries\SQLUpdate;
-use SilverStripe\ORM\Queries\SQLInsert;
 use EveryDataStore\Model\Menu;
 use EveryNotifyTemplate\Model\EveryNotifyTemplate;
 use EveryDataStore\Model\RecordSet\Form\FormSection;
@@ -13,76 +10,10 @@ use EveryDataStore\Helper\AssetHelper;
 use SilverStripe\Security\Security;
 
 /**
- * EveryDataStore v1.0
+ * EveryDataStore v1.5
 */
 class EveryDataStoreTaskHelper extends EveryDataStoreHelper {
    
-    /**
-     * Helper methods to import demo data
-     * @param array $demoData
-     */
-   public static function doImportDemoData($demoData) {
-        foreach ($demoData as $data) {
-            if (
-                    $data['type'] == 'table' && isset($data['data']) && count($data['data']) > 0 
-            ) {
-                foreach ($data['data'] as $d) {
-                    if (self::getOneBySQLSelect($data['name'], $d['ID'])) {
-                        echo '<p style="color: blue">The object of ' . $record['ClassName'] . ' with the ID ' . $d['ID'] . ' has been created/updated.</p>';
-                        self::updateOneBySQLUpdate($data['name'], $d);
-                    } else {
-                        self::insertOneBySQLInsert($data['name'], $d);
-                        echo '<p style="color: green">The object of ' . $d['ClassName'] . ' with the ID ' . $d['ID'] . ' has been created/updated.</p>';
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Gets a record by SQLSelect
-     * @param string $table
-     * @param string $recordID
-     * @return boolean|array
-     */
-    public static function getOneBySQLSelect($table, $recordID){
-        $sqlQuery = new SQLSelect();
-        $sqlQuery->setFrom("`".$table."`");
-        $sqlQuery->selectField('ID');
-        $sqlQuery->addWhere(array('ID' => $recordID));
-        $result = $sqlQuery->execute();
-        foreach ($result as $row) {
-            if ($row['ID']) return $row;
-        }
-        return false;
-    }
-
-    /**
-     * Updates a record by SQLUpdate
-     * @param string $table
-     * @param string $record
-     */
-    public static function updateOneBySQLUpdate($table, $record){
-        //if(isset($record['FolderID'])) unset ($record['FolderID']);
-        //if(isset($record['FileID'])) unset ($record['FileID']);
-        $update = SQLUpdate::create("`".$table."`")->addWhere(array('ID' => $record['ID']));
-        $update->addAssignments($record);
-        $update->execute();
-    }
-
-    /**
-     * Inserts a new record by SQLInsert
-     * @param string $table
-     * @param string $record
-     */
-    public static function insertOneBySQLInsert($table, $record){
-        //if(isset($record['FolderID'])) unset ($record['FolderID']);
-        //if(isset($record['FileID'])) unset ($record['FileID']);
-        $insert = SQLInsert::create("`".$table."`");
-        $insert->addRows(array($record));
-        $insert->execute();
-    }
-    
     /**
      * This function checks if a menu item has a translation. 
      * @param string $translation

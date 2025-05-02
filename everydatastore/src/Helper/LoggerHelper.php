@@ -1,7 +1,7 @@
 <?php
 
 namespace EveryDataStore\Helper;
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  * This class raises errors and logs diagnostic information
  */
 

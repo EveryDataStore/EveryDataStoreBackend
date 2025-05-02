@@ -5,13 +5,20 @@ SilverStripe\Core\Injector\Injector:
   Psr\Log\LoggerInterface:
     calls:
       MailHandler: [ pushHandler, [ '%$MailHandler' ] ]
+      LogFileHandler: [ pushHandler, [ '%$LogFileHandler' ] ]
+  LogFileHandler:
+    class: Monolog\Handler\StreamHandler
+    constructor:
+      - "your_project_director/log/silverstripe.log"
   MailHandler:
       class: Monolog\Handler\NativeMailerHandler
       constructor:
-        - email@exsample com
+        - error@example.com
         - There was an error on your test site
-        - email@exsample com
+        - error@example.com
         - error
+        - info
       properties:
         ContentType: text/html
         Formatter: '%$SilverStripe\Logging\DetailedErrorFormatter'
+        

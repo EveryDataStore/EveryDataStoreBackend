@@ -12,7 +12,7 @@ use SilverStripe\Assets\Image;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Core\ClassInfo;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines an App model and its appearance in the database as well as
  * in the EveryDataStore 'Apps' page.

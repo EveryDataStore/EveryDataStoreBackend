@@ -10,7 +10,7 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Assets\Storage\AssetStoreRouter;
 use SilverStripe\Core\Config\Config;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class performs router and accessibility checks for Files
  * to ensure the correct response for HTTP requests
@@ -73,7 +73,7 @@ class EveryDataStoreProtectedFileController extends Controller
         }
         $hash = $request->getVar('hash');
         if ($hash) {
-            if (!self::validiateHash($hash, $request)) {
+            if (!self::validateHash($hash, $request)) {
                  return $this->httpError(401, "The file hash is not valid. Make sure that the viewer member login 'asset_viewer_member' in the everydatastore.yml is correct ");
             }
  
@@ -125,13 +125,13 @@ class EveryDataStoreProtectedFileController extends Controller
      * This function validates the file hash
      * @param string $hash
      * @param array $request
-     * @return boolean
+     * @return boolean 
      */
-    private static function validiateHash($hash, $request) {
+    private static function validateHash($hash, $request) {
         $file = File::get()->filter(['FileHash' => $hash])->first();
         if (!$file) return false;
         
-        if (!EveryDataStoreHelper::validiateLogin($request, Config::inst()->get('asset_viewer_member', 'email'), Config::inst()->get('asset_viewer_member', 'password'))) return false;
+        if (!EveryDataStoreHelper::validateLogin($request, Config::inst()->get('asset_viewer_member', 'email'), Config::inst()->get('asset_viewer_member', 'password'))) return false;
         return true;
     }
 

@@ -11,7 +11,7 @@ use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines a Configuration model and its appearance in the database
  * as well as in the EveryDataStore 'Configurations' page.

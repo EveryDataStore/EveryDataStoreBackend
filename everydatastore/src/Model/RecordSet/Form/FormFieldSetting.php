@@ -8,7 +8,7 @@ use EveryDataStore\Model\RecordSet\Form\FormField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * Each FormField has its own group of settings. This class defines a FormFieldSetting,
  * as well as its relations to other models.

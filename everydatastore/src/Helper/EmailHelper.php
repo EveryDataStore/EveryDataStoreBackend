@@ -7,7 +7,7 @@ use SilverStripe\Control\Email\Email;
 use Silverstripe\SiteConfig\SiteConfig;
 use SilverStripe\Core\Config\Config;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class formats Email structure and content
  *
@@ -25,7 +25,7 @@ class EmailHelper extends EveryDataStoreHelper {
         $siteConfig = SiteConfig::current_site_config();
         $adminEmail = Config::inst()->get('SilverStripe\Control\Email\Email', 'admin_email');
         $resetLink = $siteConfig->FrontendURL.'setpassword/?Slug='.$member->Slug.'&Token='.$autotoken;
-        $emailBody = self::getMailHeader($siteConfig->Title);
+        //$emailBody = self::getMailHeader($siteConfig->Title);
         $emailBody .= _t('SilverStripe\Security\Member.SENDRESETLINKMEMAIL', '<p>Hello {fullname},</p><p>please us the following link to set your password</p>', ['fullname' => $member->getFullName()]);
         $emailBody .= '<a href="'.$resetLink.'">'.$resetLink.'</a>';
         $emailBody .= self::getMailFooter(Config::inst()->get('SilverStripe\Control\Email\Email', 'FOOTER'));

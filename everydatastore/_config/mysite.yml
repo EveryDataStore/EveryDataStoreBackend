@@ -1,6 +1,6 @@
 ---
-Name: myproject
+Name: everydatastorebackend
 ---
 SilverStripe\Core\Manifest\ModuleManifest:
-  project: app
+  project: everydatastore
 

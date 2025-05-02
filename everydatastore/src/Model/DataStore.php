@@ -19,7 +19,7 @@ use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\ListboxField;
 
 /**
- * EveryDataStore v1.0
+ * EveryDataStore v1.5
  * Repository (DataStore) Model is the most important model of EverDataStore.
  * All models are independent directly/indirectly from Repository
  *
@@ -408,9 +408,9 @@ class DataStore extends DataObject implements PermissionProvider {
     private function createDefaultConfig() {
         $defaultConfig = [
             'DateFormat' => 'd.m.Y',
-            'DateTimeFormat' => 'd.m.Y H:i:s',
+            'DateTimeFormat' => 'd.m.Y H:m:s',
             'Timezone' => 'Europe/Berlin',
-            'TimeFormat' => 'H:i:s',
+            'TimeFormat' => 'H:m:s',
             'ItemsPerPage' => 10,
             'MenuBadgeUpdateInterval' => 50000, // Milliseconds
             'UploadAllowedFileSize' => 2097152, // 2 MB.
@@ -466,14 +466,6 @@ class DataStore extends DataObject implements PermissionProvider {
                 {
                         "value": "yen",
                         "label": "YEN"
-                },
-                {
-                        "value": "czk",
-                        "label": "CZK"
-                },
-                {
-                        "value": "nok",
-                        "label": "NOK"
                 }]'];
         foreach($defaultConfig as $k => $v){
             $config = new EveryConfiguration();

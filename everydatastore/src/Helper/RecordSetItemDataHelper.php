@@ -7,7 +7,7 @@ use EveryDataStore\Model\RecordSet\RecordSetItem;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Assets\Folder;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class manages copying values between related DataObjects
  */
@@ -20,14 +20,16 @@ class RecordSetItemDataHelper extends EveryDataStoreHelper {
      * @return array
      */
     public static function getUploadFieldValue($recordSetItemData) {
-        $ret = [];
-        //$folderChilds = Versioned::get_by_stage('SilverStripe\Assets\Folder', Versioned::LIVE)->filter(['ParentID' => $recordSetItemData->FolderID])->sort("ID ASC");
- 
+        $ret = []; 
         foreach ($recordSetItemData->Folder()->Children() as $folder) {
             foreach ($folder->Children() as $child) {
                 if ($child->ClassName !== 'SilverStripe\Assets\Folder'){
                     $ret[] = array(
                     'Slug' => $child->Slug,
+                    'Created' => $child->Created,
+                    'LastEdited' => $child->LastEdited,
+                    'CreatedBy' => $child->CreatedBy()->getFullName(),
+                    'UpdatedBy' => $child->UpdatedBy()->getFullName(),     
                     'Size' => $child->getSize(),
                     'Name' => $child->Name,
                     'Title' => $child->Title,

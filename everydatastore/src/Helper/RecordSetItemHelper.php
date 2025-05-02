@@ -2,12 +2,13 @@
 
 namespace EveryDataStore\Helper;
 
-/** EveryDataStore/EveryDataStore v1.0
+/** EveryDataStore/EveryDataStore v1.5
  *
  * This class manages navigation, order, as well as relations between RecordSetItems
  */
 
 use EveryDataStore\Helper\EveryDataStoreHelper;
+use EveryDataStore\Helper\RecordSetItemDataHelper;
 use EveryDataStore\Model\RecordSet\RecordSetItem;
 use EveryDataStore\Model\RecordSet\RecordSetItemData;
 use SilverStripe\Versioned\Versioned;
@@ -226,5 +227,51 @@ class RecordSetItemHelper extends EveryDataStoreHelper {
         $new_item_data->FormFieldID = $item_data->FormFieldID;
         $new_item_data->Value = $item_data->Value;
         $new_item_data->write();
+    }
+    
+    /**
+     * Returns true if member has permission to edit, view or delete RecordSetItem.
+     * @param DataObject $recordSetItem
+     * @param DataObject $member
+     * @return boolean
+     */
+    public static function canDoCreatedBy($recordSetItem, $member = null){
+        $memberID = $member ? $member->ID : self::getMemberID();
+        $PermissionRecordSets = Config::inst()->get('EveryDataStore\Model\RecordSet\RecordSetItem', 'PermissionRecordSets');
+  
+        if($PermissionRecordSets && in_array($recordSetItem->RecordSet()->Slug, $PermissionRecordSets)){
+            if($memberID == $recordSetItem->CreatedBy()->ID){
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Mapping RecordSetItem fields with the file fields.
+     * @param DataObject $recordSetItem
+     * @param array $config
+     */
+    public static function mapRecordSetItemFieldsWithFileFields($recordSetItem, $config) {
+        $uploadFieldItemData = $recordSetItem->ItemData()->filter(['FormField.Slug' => $config['MappingFields']['UploadField']])->first();
+        if ($uploadFieldItemData) {
+            $uploadFieldValue = RecordSetItemDataHelper::getUploadFieldValue($uploadFieldItemData);
+            if ($uploadFieldValue) {
+                foreach ($uploadFieldValue[0] as $k => $v) {
+                    if (isset($config['MappingFields'][$k])) {
+                        $formField = DataObject::get('EveryDataStore\Model\RecordSet\Form\FormField')->filter(['Slug' => $config['MappingFields'][$k]])->first();
+                        $itemData = $formField ? $recordSetItem->ItemData()->filter(['FormFieldID' => $formField->ID])->first() : null;
+                        if (!$itemData) {
+                            $itemData = new RecordSetItemData();
+                            $itemData->FormFieldID = $formField->ID;
+                            $itemData->RecordSetItemID = $recordSetItem->ID;
+                        }
+                        $itemData->Value = $v;
+                        $itemData->write();
+                    }
+                }
+            }
+        }
     }
 }

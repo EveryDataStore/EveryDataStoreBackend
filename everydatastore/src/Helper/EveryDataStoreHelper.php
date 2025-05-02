@@ -25,8 +25,12 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Security\IdentityStore;
 use SilverStripe\Versioned\Versioned;
+use EveryDataStore\Model\DataStore;
+use EveryDataStore\Model\EveryConfiguration;
+use EveryDataStore\Model\Menu;
+use EveryDataStore\Model\RecordSet\RecordSet;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5 
  *
  * This is the main helper class of EveryDataStore, it contains many different methods to manage
  * software security and database queries.
@@ -224,7 +228,7 @@ class EveryDataStoreHelper {
      * @param string $pwd
      * @return boolean True if the the member exists
      */
-    public static function validiateLogin($request, $user = null, $pwd = null){
+    public static function validateLogin($request, $user = null, $pwd = null){
         $user = $user ? $user : $request->getVar('user');
         $pwd  = $pwd ? $pwd :  $request->getVar('pwd');
         $member = $user && $pwd ? self::getMemberByEmailAndPassword($user, $pwd, $request, null): null;
@@ -346,7 +350,7 @@ class EveryDataStoreHelper {
             $item = self::getItemByClassAndSlug($slug, $class);
             if ($item) {
                 if(EveryDataStoreHelper::isVersioned($item->ClassName)){
-                    EveryDataStoreHelper::deleteOneFromStage($item->ID, $item->ClassName, 'Stage');
+                    EveryDataStoreHelper::deleteOneFromStage($item->ID, $item->ClassName, Versioned::DRAFT);
                 }
                 $item->delete();
             }
@@ -360,7 +364,7 @@ class EveryDataStoreHelper {
     public static function deleteDataObjects($objs){
         foreach($objs as $obj){
             if(EveryDataStoreHelper::isVersioned($obj->ClassName)){
-                EveryDataStoreHelper::deleteOneFromStage($obj->ID, $obj->ClassName, 'Stage');
+                EveryDataStoreHelper::deleteOneFromStage($obj->ID, $obj->ClassName, Versioned::DRAFT);
             }
             $obj->delete();
         }
@@ -482,12 +486,8 @@ class EveryDataStoreHelper {
         $decimal = $formatConfig && isset($formatConfig['decimal']) ? $formatConfig['decimal']: Config::inst()->get('number_format','decimal');
         $decimal_separator = $formatConfig && isset($formatConfig['decimal_separator']) ? $formatConfig['decimal_separator']: Config::inst()->get('number_format','decimal_separator');
         $thousand_separator = $formatConfig && isset($formatConfig['thousand_separator']) ? $formatConfig['thousand_separator']: Config::inst()->get('number_format','thousand_separator');
+        return number_format((float)$number, $decimal, $decimal_separator, $thousand_separator);
 
-        return number_format(
-               floatval ($number),
-               $decimal,
-               $decimal_separator,
-               $thousand_separator);
     }
 
     /**
@@ -503,7 +503,9 @@ class EveryDataStoreHelper {
             return Member::get()->filter(array('Slug' => $slug, 'CurrentDataStoreID' => self::getCurrentDataStoreID()))->first();
         } elseif ($class == 'File') {
             return File::get()->filter(array('Slug' => $slug, 'DataStoreID' => self::getCurrentDataStoreID()))->first();
-        } else {
+        } elseif ($class == 'Menu') {
+            return Menu::get()->filter(array('Slug' => $slug, 'DataStoreID' => self::getCurrentDataStoreID()))->first();
+        }else {
             return $class::get()->filter(array('Slug' => $slug, 'DataStoreID' => self::getCurrentDataStoreID()))->first();
         }
     }
@@ -593,6 +595,7 @@ class EveryDataStoreHelper {
      */
     public static function getNicePermissionCodes() {
         $codes = Permission::get_codes();
+
         $nicePermissionCodes = [];
         unset(
                 $codes['App']['DELETE_APP'],
@@ -602,8 +605,8 @@ class EveryDataStoreHelper {
                 $codes[_t('SilverStripe\\Security\\Permission.CONTENT_CATEGORY', 'Content permissions')],
                 $codes[_t('SilverStripe\\Security\\Permission.CMS_ACCESS_CATEGORY', 'CMS Access')],
                 $codes['Other'],
-                $codes[_t('SilverStripe\\Security\\Permission.PERMISSIONS_CATEGORY', 'Roles and access permissions'
-                )]
+                $codes[_t('SilverStripe\\Security\\Permission.PERMISSIONS_CATEGORY', 'Roles and access permissions')],
+                $codes[_t('SilverStripe\\Dev\\DevelopmentAdmin.PERMISSIONS_CATEGORY', 'Dev permissions')]
         );
 
         foreach ($codes as $k => $v) {
@@ -979,5 +982,39 @@ class EveryDataStoreHelper {
      */
     public static function isSerialized($str) {
             return ($str == serialize(false) || @unserialize($str) !== false);
+    }
+    
+    /**
+     * Returns true if member has group
+     * @param DataObject $groups
+     * @return boolean
+     */
+    public static function isMemberInGroups($groups) {
+        $member = self::getMember();
+        if ($member && $groups && $groups->Count() > 0) {
+            if (Permission::check('ADMIN')) {
+                return true;
+            }
+            foreach ($groups as $group) {
+                if ($group->Members()->byID($member->ID)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+   public static function setHeaderResponse($code, $msg) {
+        header('HTTP/1.1 ' . $code . '  ' . $msg);
+        exit();
+    }
+    
+    public static function isTechnicalUser($email){
+        $cronUser = Config::inst()->get('cron_member', 'email');
+        $assetViewerUser = Config::inst()->get('asset_viewer_member', 'email');
+        if($email == $cronUser || $email == $assetViewerUser){
+            return true;
+        }
+        return false;
     }
 }

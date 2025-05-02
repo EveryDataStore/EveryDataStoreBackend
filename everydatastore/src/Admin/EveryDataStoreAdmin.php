@@ -3,7 +3,7 @@ namespace EveryDataStore\Admin;
 
 use SilverStripe\Admin\ModelAdmin;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  * This class defines everyDataStore's own Model SilverStripe-Admin
  */
 
