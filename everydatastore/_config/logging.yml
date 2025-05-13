@@ -9,7 +9,7 @@ SilverStripe\Core\Injector\Injector:
   LogFileHandler:
     class: Monolog\Handler\StreamHandler
     constructor:
-      - "your_project_director/log/silverstripe.log"
+      - "full_path_to_your_project_directory/log/silverstripe.log"
   MailHandler:
       class: Monolog\Handler\NativeMailerHandler
       constructor:

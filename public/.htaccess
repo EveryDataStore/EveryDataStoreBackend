@@ -29,16 +29,6 @@ ErrorDocument 500 /assets/error-500.html
 
     SetEnv HTTP_MOD_REWRITE On
     RewriteEngine On
-    #RewriteCond %{ENV:HTTPS} !on
-    #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-    RewriteCond %{HTTP:X-Forwarded-Proto} =http [OR]
-    # ...or just a plain old http request directly from the client
-    RewriteCond %{HTTP:X-Forwarded-Proto} =""
-    RewriteCond %{HTTPS} !=on
-
-    # Redirect to https version
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Enable HTTP Basic authentication workaround for PHP running in CGI mode
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -53,6 +43,5 @@ ErrorDocument 500 /assets/error-500.html
     # Process through SilverStripe if no file with the requested name exists.
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule .* index.php
-
 </IfModule>
 ### SILVERSTRIPE END ###

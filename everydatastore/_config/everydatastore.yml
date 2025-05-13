@@ -51,7 +51,7 @@ SilverStripe\Control\Email\Email:
   admin_email: 'admin@example.com'
 # defines the life time of a recordset item in seconds
 draft_recordset_item_life_time: 11
-everydatastore_tmp_dir_path: 'your_project_director/tmp'
+everydatastore_tmp_dir_path: 'full_path_to_your_project_directory/tmp'
 EveryDataStore\Model\RecordSet\RecordSetItem:
 #PermissionRecordSets define which RecordSets allow RecordSetItems to be viewed (canView) only by their respective owners.
     PermissionRecordSets: ['RecordSetSlu_1', 'RecordSetSlu_2']

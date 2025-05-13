@@ -1,4 +1,4 @@
-#This logic maps a RecordSet to the DataObject File
+#This logic maps RecordSet fields to corresponding fields in the File DataObject.
 EveryDataStore\Model\RecordSet\RecordSetItem:
     MapRecordSets:
         #Put here the RecordSet slug e.g.:

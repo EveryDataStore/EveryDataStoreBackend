@@ -106,25 +106,9 @@ class RecordSetItemData extends DataObject {
             $niceNumber = $prefixValue.RecordSetItemDataHelper::getNiceNumberFormat($this->Value).$suffixValue;
             return $niceNumber;
         }
-                
-        // check if value a datefield
-        /*
-        if($this->FormField()->getTypeSlug() == 'textfield'){
-
-            $type = RecordSetItemDataHelper::getFormFieldSetting($this->FormField()->Settings(), 'type');
-            if($type == 'date' || $type == 'datetime' || $type == 'time'){
-                $format = RecordSetItemDataHelper::getFormFieldSetting($this->FormField()->Settings(), 'dateformat');
-                if($type == 'datetime' || $type == 'time'){
-                    $format.=' H:i:s';
-                }
-
-               $retValue = $format ? date_format(date_create($this->Value), $format) : $retValue;
-            }
-        }
-        */
         
         
-        if($this->FolderID > 0 &&  $this->FormField()->getTypeSlug() == 'uploadfield'){
+        if($this->FolderID > 0 &&  $textFieldType == 'uploadfield'){
                return RecordSetItemDataHelper::getUploadFieldValue($this);
         } 
         
@@ -133,13 +117,15 @@ class RecordSetItemData extends DataObject {
             return RecordSetItemDataHelper::getRelationFieldValue($this);
         }
         
+        
         if(is_array(unserialize($this->Value))){
             $retValue = unserialize($this->Value);
         }
-        
+        /*
         if(EveryTranslatorHelper::isTranslatableRecordSet($this->RecordSetItem()->RecordSet()->Slug)){
             $retValue = EveryTranslatorHelper::_t($retValue, true);
         }
+        */
         
         return  $retValue;
       }

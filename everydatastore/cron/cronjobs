@@ -1,10 +1,10 @@
 Create the following tasks in your crontab to keep to keep EveryDataStore performance high::
-0 0 * * * rm -rf {path to your project director}/silverstripe-cache/*
-0 0 * * * php {path to your project director}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=updateStorageCurrentSize
-0 0 * * * php {path to your project director}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=deleteDraftRecordSetItems
-0 0 * * * php {path to your project director}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=emptyTmpDir
-0 0 * * * php {path to your project director}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=deleteUnusedTranslations
-*/5 * * * * php {path to your project director}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=createWidgetJsonFile
-0 0  * * * php {project-path}/vendor/silverstripe/framework/cli-script.php dev/tasks/TruncateVersionsTaskExtension reset=1
-0 0 * * * cp {path to your project director}/silverstripe.log  {path to your project director}/log/silverstripe_$(date +\%Y\%m\%d).log; > {path to your project director}/log/silverstripe.log
+0 0 * * * rm -rf {path to your project directory}/silverstripe-cache/*
+0 0 * * * php {full path to your project directory}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=updateStorageCurrentSize
+0 0 * * * php {full path to your project directory}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=deleteDraftRecordSetItems
+0 0 * * * php {full path to your project directory}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=emptyTmpDir
+0 0 * * * php {full path to your project directory}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=deleteUnusedTranslations
+*/5 * * * * php {full path to your project directory}/vendor/silverstripe/framework/cli-script.php dev/tasks/EveryDataStoreTask action=createWidgetJsonFile
+0 0  * * * php {full path to your project directory}/vendor/silverstripe/framework/cli-script.php dev/tasks/TruncateVersionsTaskExtension reset=1
+0 0 * * * cp {full path to your project directory}/silverstripe.log  {full path to your project directory}/log/silverstripe_$(date +\%Y\%m\%d).log; > {full path to your project directory}/log/silverstripe.log
 
