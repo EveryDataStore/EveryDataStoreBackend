@@ -67,10 +67,10 @@ class GroupExtension extends DataExtension implements PermissionProvider {
      */
     public function updateCMSFields(FieldList $fields)
     {
-        $fields->RemoveByName('Members', 'Main');
+        //$fields->RemoveByName('Members', 'Main');
         $fields->RemoveByName(['ParentID']);
         $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), ReadonlyField::create('Slug', 'Slug'));
-
+        $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), TextField::create('Title', _t($this->owner->ClassName . '.Title', 'Title')));
         $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), TextField::create('Name', _t($this->owner->ClassName . '.NAME', 'Name')));
         $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), TextField::create('Description', _t('SilverStripe\\Security\\Group.Description', 'Description')));
 

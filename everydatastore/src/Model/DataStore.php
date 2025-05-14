@@ -11,6 +11,7 @@ use EveryDataStore\Model\RecordSet\RecordSet;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\PermissionProvider;
+use SilverStripe\Security\Permission;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Security\Group;
 use SilverStripe\Assets\Folder;
@@ -120,28 +121,25 @@ class DataStore extends DataObject implements PermissionProvider {
         if($this->AdminID == 1 && EveryDataStoreHelper::getCurrentDataStoreAdminID()){
             $this->AdminID = EveryDataStoreHelper::getCurrentDataStoreAdminID();
         }
-    }
-
-    public function onAfterWrite() {
-        $this->createDeafultMembers();
         
-        if ($this->owner->Menu()->Count() == 0) {
+        $this->createDefaultGroups();
+        $this->createDeafultMembers();
+        if ($this->Menu()->Count() == 0) {
             $this->createDefaultMenus();
         }
-
-        if ($this->owner->Groups()->Count() == 0) {
-            $this->createDefaultGroups();
-        }
-
-        if ($this->owner->Configurations()->Count() == 0) {
+        if ($this->Configurations()->Count() == 0) {
             $this->createDefaultConfig();
         }
-
-        if ($this->owner->Apps()->Count() == 0) {
+        if ($this->Apps()->Count() == 0) {
             $this->installDefaultApps();
         }
-        
         $this->setAdminCurrentDataStore();
+    }
+    
+    /**
+     * NOT WORKING!!!!!
+     */
+    public function onAfterWrite() {
         parent::onAfterWrite();
     }
 
@@ -179,30 +177,36 @@ class DataStore extends DataObject implements PermissionProvider {
      * Creates DataStore default members
      */
     private function createDeafultMembers() {
-       $default_admin = EveryDataStoreHelper::getDefaultAdmin('admin');
-        if (!$default_admin) {
-            $default_admin = EveryDataStoreHelper::createDefaultAdmin();
-        }
-       
-        $this->owner->Members()->Add($default_admin->ID);
-         
-        $default_member = EveryDataStoreHelper::getDefaultMember('default_member');
-        if (!$default_member) {
-            $default_member = EveryDataStoreHelper::createDefaultMember('default_member');
-        }
-        $this->owner->Members()->Add($default_member->ID);
+        $adminsGroup = Group::get()->filter(['Code' => strtolower($this->owner->Title . '-admins')])->first();
+        if ($adminsGroup) {
+            $default_admin = EveryDataStoreHelper::getDefaultAdmin('admin');
+            if (!$default_admin) {
+                $default_admin = EveryDataStoreHelper::createDefaultAdmin();
+            }
+            $adminsGroup->Members()->add($default_admin);
+            $this->owner->Members()->add($default_admin->ID);
 
-        $asset_viewer_member = EveryDataStoreHelper::getDefaultMember('asset_viewer_member');
-        if (!$asset_viewer_member) {
-            $asset_viewer_member = EveryDataStoreHelper::createDefaultMember('asset_viewer_member');
-        }
-        $this->owner->Members()->Add($asset_viewer_member->ID);
+            $default_member = EveryDataStoreHelper::getDefaultMember('default_member');
+            if (!$default_member) {
+                $default_member = EveryDataStoreHelper::createDefaultMember('default_member');
+            }
+            $adminsGroup->Members()->add($default_member);
+            $this->owner->Members()->add($default_member->ID);
 
-        $cron_member = EveryDataStoreHelper::getDefaultMember('cron_member');
-        if (!$cron_member) {
-            $cron_member = EveryDataStoreHelper::createDefaultMember('cron_member');
+            $asset_viewer_member = EveryDataStoreHelper::getDefaultMember('asset_viewer_member');
+            if (!$asset_viewer_member) {
+                $asset_viewer_member = EveryDataStoreHelper::createDefaultMember('asset_viewer_member');
+            }
+            $adminsGroup->Members()->add($asset_viewer_member);
+            $this->owner->Members()->add($asset_viewer_member->ID);
+
+            $cron_member = EveryDataStoreHelper::getDefaultMember('cron_member');
+            if (!$cron_member) {
+                $cron_member = EveryDataStoreHelper::createDefaultMember('cron_member');
+            }
+            $adminsGroup->Members()->add($cron_member);
+            $this->owner->Members()->add($cron_member->ID);
         }
-        $this->owner->Members()->Add($cron_member->ID);
     }
 
     /**
@@ -383,13 +387,21 @@ class DataStore extends DataObject implements PermissionProvider {
      * Creates default dataStore groups
      */
     private function createDefaultGroups() {
-        if (Group::get()->Count() > 2) {
+        $checkGroup = Group::get()->filter(['Title' => 'Admins', 'DataStoreID' => $this->owner->ID])->first();
+        if (!$checkGroup) {
             $group = new Group();
-            $group->Title = $this->owner->Title . '-Admins';
+            $group->Title = 'Admins';
+            $group->Name = 'Admins';
             $group->DataStoreID = $this->owner->ID;
             $group->write();
             $RepoAdmin = $this->owner->Admin();
             $group->Members()->add($RepoAdmin);
+            $permission = new Permission();
+            $permission->Code = 'ADMIN';
+            $permission->GroupID = $group->ID;
+            $permission->Arg = 0;
+            $permission->write();
+            $group->Permissions()->add($permission);
         }
     }
 
