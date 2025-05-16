@@ -10,7 +10,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines a RecordFormSection, i.e., a Section within a Form for creating a RecordSet,
  * as well as its relations.

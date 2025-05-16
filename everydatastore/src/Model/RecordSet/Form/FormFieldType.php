@@ -6,7 +6,7 @@ use EveryDataStore\Helper\EveryDataStoreHelper;
 use EveryDataStore\Model\RecordSet\Form\FormField;
 use SilverStripe\ORM\DataObject;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * FromFields can be of different types. This class defines a FormFieldType,
  * as well as its relations to other models.

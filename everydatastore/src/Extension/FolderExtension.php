@@ -12,7 +12,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Security\PermissionProvider;
 
-/** EveryDataStore/EveryDataStore v1.0
+/** EveryDataStore/EveryDataStore v1.5
  *
  * This extension overwrites some methods of the Folder model, its relations and its permissions
  *

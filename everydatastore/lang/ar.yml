@@ -15,6 +15,7 @@ ar:
         LASTEDITED: 'تاريخ التغيير الأخير'
         CREATEDBY: 'انشأ من قبل'
         UPDATEDBY: 'تغيير من قبل'
+        NOPERMISSION: 'You do not have permission to perform this action {action}'
     EveryDataStore\Model\DataStore:
         MAIN: 'رئيسي'
         TITLE: 'الاسم'
@@ -37,6 +38,7 @@ ar:
         PRICE: 'السعر'
         INSTALLED: 'مثبت'
         ICON: 'أيقونة'
+        MOBILEAPPICON: 'موبايل أيقونة'
         DISPLAYPRICE: 'السعر'
     EveryDataStore\Model\Menu:
         TITLE: 'الاسم'

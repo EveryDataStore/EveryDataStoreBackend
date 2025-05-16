@@ -5,7 +5,7 @@ namespace EveryDataStore\Extension;
 use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataExtension;
 
-/** EveryDataStore/EveryDataStore v1.0
+/** EveryDataStore/EveryDataStore v1.5
  *
  * This extension overwrites of the Permission model, its relations and its permissions
  *

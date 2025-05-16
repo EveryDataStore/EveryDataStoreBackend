@@ -11,7 +11,7 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\FieldList;
 
-/** EveryDataStore/EveryDataStore v1.0
+/** EveryDataStore/EveryDataStore v1.5
  *
  * This extension overwrites some methods of Group model, its relations and its permissions
  *
@@ -22,7 +22,8 @@ use SilverStripe\Forms\FieldList;
 class GroupExtension extends DataExtension implements PermissionProvider {
 
     private static $db = [
-        'Slug' => 'Varchar(110)'
+        'Slug' => 'Varchar(110)',
+        'Name' => 'Varchar(255)',
     ];
 
     private static $has_one = [
@@ -32,18 +33,20 @@ class GroupExtension extends DataExtension implements PermissionProvider {
     ];
 
     private static $summary_fields = [
-        'Title'
+        'Name',
+        'Title',
+        'Description'
     ];
 
     private static $searchable_fields = [
-        'Title' => [
+        'Name' => [
             'field' => TextField::class,
             'filter' => 'PartialMatchFilter',
         ]
     ];
 
     private static $FrontendTapedForm = true;
-    private static $default_sort = "\"Title\"";
+    private static $default_sort = "\"Name\"";
     /**
      * This function returns all user defined searchable field labels that exist on Group page
      * @param boolean $includerelations
@@ -64,11 +67,12 @@ class GroupExtension extends DataExtension implements PermissionProvider {
      */
     public function updateCMSFields(FieldList $fields)
     {
-        $fields->RemoveByName('Members', 'Main');
+        //$fields->RemoveByName('Members', 'Main');
         $fields->RemoveByName(['ParentID']);
         $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), ReadonlyField::create('Slug', 'Slug'));
-
-        $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), TextField::create('Title', _t($this->owner->ClassName . '.TITLE', 'Title')));
+        $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), TextField::create('Title', _t($this->owner->ClassName . '.Title', 'Title')));
+        $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), TextField::create('Name', _t($this->owner->ClassName . '.NAME', 'Name')));
+        $fields->addFieldToTab('Root.'._t('Global'. '.MAIN', 'Main'), TextField::create('Description', _t('SilverStripe\\Security\\Group.Description', 'Description')));
 
 }
 
@@ -88,10 +92,16 @@ class GroupExtension extends DataExtension implements PermissionProvider {
             if (!$this->owner->CreatedByID) {
                 $this->owner->CreatedByID = $member->ID;
             }
-
+            
             $this->owner->DataStoreID = $member->CurrentDataStoreID;
             $this->owner->UpdatedByID = $member->ID;
+            if($this->owner->Title !== 'Administrators' && $this->owner->Name){
+                $this->owner->Title = strtolower(str_replace(' ', '-', EveryDataStoreHelper::getCurrentDataStore()->Title).'-'.$this->owner->Name);
+            }
+        }else{
+           $this->owner->Title = $this->owner->ID;
         }
+        
     }
 
     public function onAfterWrite() {

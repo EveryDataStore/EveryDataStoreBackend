@@ -26,7 +26,7 @@ use SilverStripe\Assets\Image;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\i18n\Data\Intl\IntlLocales;
 
-/** EveryDataStore/EveryDataStore v1.0
+/** EveryDataStore/EveryDataStore v1.5
  *
  * This extension overwrites some methods of the Member model, its relations and its permissions
  * It configures current dataStore according to the current member permissions and preferences
@@ -140,7 +140,7 @@ class MemberExtension extends DataExtension implements PermissionProvider {
      * @param FieldList $fields
      */
     public function updateCMSFields(FieldList $fields) {
-        $fields->removeFieldFromTab('Root.Main', ['RESTFulToken', 'Avatar', 'ThemeColor', 'AdminID', 'Slug', 'Active', 'SendPasswordResetLink', 'Password', 'DirectGroups', 'UpdatedByID', 'CreatedByID', 'RESTFulTokenExpire', 'FailedLoginCount']);
+        $fields->removeFieldFromTab('Root.Main', ['RESTFulToken', 'Avatar', 'ThemeColor', 'AdminID', 'Slug', 'Active', 'SendPasswordResetLink', 'DirectGroups', 'UpdatedByID', 'CreatedByID', 'RESTFulTokenExpire', 'FailedLoginCount', 'RequiresPasswordChangeOnNextLogin']);
         $fields->RemoveByName(['Permissions', 'CurrentDataStore', 'DataStores']);
         $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), TextField::create('FirstName', _t($this->owner->ClassName . '.FIRSTNAME', 'Firstname')), 'Firstname');
         $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), TextField::create('Surname', _t($this->owner->ClassName . '.SURNAME', 'Surname')), 'Surname');
@@ -150,40 +150,42 @@ class MemberExtension extends DataExtension implements PermissionProvider {
         $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main') , TextField::create('City', _t($this->owner->ClassName . '.CITY', 'City')));
         $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main') , DropdownField::create('Country', _t($this->owner->ClassName . '.COUNTRY', 'Country'), IntlLocales::singleton()->getCountries()));
         $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), TextField::create('Phone', _t($this->owner->ClassName . '.PHONE', 'Phone')));
-
+        
+        
         if (EveryDataStoreHelper::checkPermission('VIEW_MEMBER') && EveryDataStoreHelper::checkPermission('CREATE_MEMBER') && EveryDataStoreHelper::checkPermission('EDIT_MEMBER')) {
             $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), ReadonlyField::create('Slug', 'Slug'), 'FirstName');
             $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), CheckboxField::create('Active', _t($this->owner->ClassName . '.ACTIVE', 'Active')), 'FirstName');
             $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), EmailField::create('Email', _t($this->owner->ClassName . '.EMAIL', 'Email')), 'Email');
 
-            $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), CheckboxField::create('SendPasswordResetLink', _t($this->owner->ClassName . '.SENDPASSWORDRESETLINK', 'Send password reset link to user Email')), 'FirstName');
-            $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.DATASTORES', 'Datastores'), ListboxField::create('DataStores', _t(__Class__ . '.DATASTORES', 'DataStores'), DataStore::get()->filter(['AdminID' => EveryDataStoreHelper::getCurrentDataStoreAdminID()])->Map(EveryDataStoreHelper::getMapField(), 'Title')->toArray()));
-
             if (EveryDataStoreHelper::checkPermission('ADMIN')) {
+                $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), CheckboxField::create('SendPasswordResetLink', _t($this->owner->ClassName . '.SENDPASSWORDRESETLINK', 'Send password reset link to user Email')), 'FirstName');
+                $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.DATASTORES', 'Datastores'), ListboxField::create('DataStores', _t(__Class__ . '.DATASTORES', 'DataStores'), DataStore::get()->filter(['AdminID' => EveryDataStoreHelper::getCurrentDataStoreAdminID()])->Map(EveryDataStoreHelper::getMapField(), 'Title')->toArray()));
                 $Groups = ListboxField::create('DirectGroups', _t(__Class__ . '.GROUPS', 'Groups'), Group::get()->Map('ID', 'Title')->toArray());
             } else {
                 $Groups = ListboxField::create('Groups', _t(__Class__ . '.GROUPS', 'Groups'), Group::get()->filter(['DataStore.ID' => EveryDataStoreHelper::getCurrentDataStoreID()])->Map(EveryDataStoreHelper::getMapField(), 'Title')->toArray());
             }
+            
             $fields->addFieldToTab('Root.' . _t('Global.GROUPS', 'Groups'), $Groups);
         }
 
         $Avatar = UploadField::create('Avatar', _t($this->owner->ClassName . '.AVATAR', 'Avatars'));
-        //$Avatar->setAllowedExtensions(['png,jpg,jpeg']);
         $Avatar->setAllowedMaxFileNumber(1);
         $fields->addFieldToTab('Root.' . _t('Global.AVATAR', 'Avatar'), $Avatar, 'Active');
 
-        if ($this->owner->ID > 0 && $this->owner->ID == EveryDataStoreHelper::getMemberID()) {
+        
             $Avatar = UploadField::create('Avatar', _t($this->owner->ClassName . '.AVATAR', 'Avatars'));
             $Avatar->setAllowedExtensions(['png,jpg,jpeg']);
             $Avatar->setAllowedMaxFileNumber(1);
             $fields->addFieldToTab('Root.'._t($this->owner->ClassName . '.MAIN', 'Main'), HiddenField::create('Slug', 'Slug'), 'FirstName');
             $fields->addFieldToTab('Root.' . _t('Global.AVATAR', 'Avatar'), $Avatar, 'Active');
+            $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.SETTINGS', 'Settings'), DropdownField::create('Locale', _t($this->owner->ClassName . '.LANGUAGE', 'Language'), Config::inst()->get('Frontend_Languages'))->setEmptyString(_t('Global.SELECTONE', 'Select one')));
+            $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.SETTINGS', 'Settings'), DropdownField::create('ThemeColor', _t($this->owner->ClassName . '.THEMECOLOR', 'Theme Color'), Config::inst()->get('Frontend_Themes'))->setEmptyString(_t('Global.SELECTONE', 'Select one')));
+            
+        //if (!EveryDataStoreHelper::checkPermission('ADMIN')) {
             $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.CHANGEPASSWORD', 'Change password'), PasswordField::create('OldPassword', _t($this->owner->ClassName . '.OLDPASSWORD', 'Old password'))->setAttribute('autocomplete', 'off'));
             $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.CHANGEPASSWORD', 'Change password'), PasswordField::create('Password', _t($this->owner->ClassName . '.PASSPWORD', 'Password'), ''));
             $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.CHANGEPASSWORD', 'Change password'), PasswordField::create('ConfirmPassword', _t($this->owner->ClassName . '.CONFIRMPASSPWORD', 'Confirm password')));
-            $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.SETTINGS', 'Settings'), DropdownField::create('Locale', _t($this->owner->ClassName . '.LANGUAGE', 'Language'), Config::inst()->get('Frontend_Languages'))->setEmptyString(_t('Global.SELECTONE', 'Select one')));
-            $fields->addFieldToTab('Root.' . _t($this->owner->ClassName . '.SETTINGS', 'Settings'), DropdownField::create('ThemeColor', _t($this->owner->ClassName . '.THEMECOLOR', 'Theme Color'), Config::inst()->get('Frontend_Themes'))->setEmptyString(_t('Global.SELECTONE', 'Select one')));
-        }
+        //}
     }
 
     /**
@@ -259,7 +261,7 @@ class MemberExtension extends DataExtension implements PermissionProvider {
      */
     public function Icon() {
         if ($this->owner->Avatar() && $this->owner->Avatar()->ID > 0) {
-            return $this->owner->Avatar()->getThumbnailURL();
+           return $this->owner->Avatar()->Fit(30,30)->getAbsoluteURL().'?hash='.$this->owner->Avatar()->FileHash;
         }
     }
 
@@ -331,6 +333,10 @@ class MemberExtension extends DataExtension implements PermissionProvider {
      * @return bool True if the the member is allowed to do the given action
      */
     public function canView($member = null) {
+        if(EveryDataStoreHelper::isTechnicalUser($this->owner->Email)){
+            return Permission::check('ADMIN') ? true : false;
+        }
+        
         return EveryDataStoreHelper::checkPermission('VIEW_MEMBER');
     }
 

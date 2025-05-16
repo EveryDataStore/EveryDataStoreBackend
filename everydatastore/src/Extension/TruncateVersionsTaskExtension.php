@@ -11,7 +11,7 @@ use SilverStripe\ORM\DB;
 use SilverStripe\ORM\Queries\SQLSelect;
 use SilverStripe\Versioned\Versioned;
 
-/** EveryDataStore/EveryDataStore v1.0
+/** EveryDataStore/EveryDataStore v1.5 
  *
  * This extension overwrites the calls Axllent\VersionTruncator\Tasks\TruncateVersionsTask,only logged-in users could run this task
  * @copyright (c) https://github.com/axllent/silverstripe-version-truncator/tree/master
@@ -53,7 +53,7 @@ class TruncateVersionsTaskExtension extends BuildTask
      */
 
     public function run($request) {
-        if (Director::is_cli() && !EveryDataStoreHelper::validiateLogin($request, Config::inst()->get('cron_member', 'email'), Config::inst()->get('cron_member', 'password'))) {
+        if (Director::is_cli() && !EveryDataStoreHelper::validateLogin($request, Config::inst()->get('cron_member', 'email'), Config::inst()->get('cron_member', 'password'))) {
             LoggerHelper::error("login failed for cron user ".Config::inst()->get('cron_member', 'email'), EveryDataStoreCronController::class);
             return;
         }

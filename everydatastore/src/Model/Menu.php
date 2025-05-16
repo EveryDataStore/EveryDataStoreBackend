@@ -15,8 +15,9 @@ use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines a Menu model and its appearance in the database
  * as well as in the EveryDataStore 'Menu' page.
@@ -36,9 +37,9 @@ use SilverStripe\Control\Director;
  * @property string $ActionID Slug of the page that opens after clicking on the menu item
  * @property string $ActionOtherID
  * @property string $Icon Name of the icon, i.e., a representative figure or image for the Menu
+ * @property string $MobileAppIcon Name of the icon for the mobile app, i.e., a representative figure or image for the Menu
  * @property string $BadgeEndpoint
  * @property integer $Sort Specifies the position, i.e., the order of the Menu item
- *
  *
  */
 
@@ -58,6 +59,7 @@ class Menu extends DataObject implements PermissionProvider {
         'ActionID' => 'Varchar(110)',
         'ActionOtherID' => 'Varchar(100)',
         'Icon' => 'Varchar(50)',
+        'MobileAppIcon' => 'Varchar(50)',
         'BadgeEndpoint' => 'Varchar(255)',
         'Sort' => 'Int(11)',
     ];
@@ -105,7 +107,7 @@ class Menu extends DataObject implements PermissionProvider {
 
     private static $default_records = [
             'Title' => 'My Menu',
-            'Active' => true,
+            'Active' => 1,
             'AdminMenu' => false,
             'UserMenu' => false,
             'Controller' => '',
@@ -113,7 +115,8 @@ class Menu extends DataObject implements PermissionProvider {
             'ActionID' => '',
             'ActionOtherID' => '',
             'Icon' => 'fa fa-asterisk',
-            'BadgeEndpoint' => ''
+            'BadgeEndpoint' => '',
+            'Sort' => 1
      ];
 
     public function fieldLabels($includerelations = true) {
@@ -126,6 +129,7 @@ class Menu extends DataObject implements PermissionProvider {
 
     public function getCMSFields() {
         $fields = parent::getCMSFields();
+
         $fields->addFieldToTab('Root.Main', ReadonlyField::create('Slug', 'Slug', $this->Slug));
         $fields->addFieldToTab('Root.Main', TextField::create('Title', _t(__Class__ .'.TITLE', 'Title')));
         $fields->addFieldToTab('Root.Main', CheckboxField::create('Active', _t(__Class__ .'.ACTIVE', 'Active')));
@@ -136,6 +140,7 @@ class Menu extends DataObject implements PermissionProvider {
         $fields->addFieldToTab('Root.Main', TextField::create('ActionID', _t(__Class__ .'.ACTION_ID', 'Action ID')));
         $fields->addFieldToTab('Root.Main', TextField::create('ActionOtherID', _t(__Class__ .'.ACTION_OTHER_ID', 'Action other ID')));
         $fields->addFieldToTab('Root.Main', TextField::create('Icon', _t(__Class__ .'.ICON', 'Icon')));
+        $fields->addFieldToTab('Root.Main', DropdownField::create('MobileAppIcon', _t(__Class__ .'.MOBILEAPPICON', 'Mobile App Icon'), $this->niceMobileAppIcons()));
         $fields->addFieldToTab('Root.Main', TextField::create('BadgeEndpoint', _t(__Class__ .'.BADGEENDPOINT', 'Badge Endpoint')));
         $fields->addFieldToTab('Root.Main', TextField::create('Sort', _t(__Class__ .'.SORT', 'Sort')));
 
@@ -149,12 +154,11 @@ class Menu extends DataObject implements PermissionProvider {
 
     public function onBeforeWrite() {
         parent::onBeforeWrite();
-        if ($this->Sort < 1) {
+        if ($this->Sort == '' || $this->Sort < 1 ) {
             $this->Sort = DB::prepared_query(
                 'SELECT MAX("Sort") + 1 FROM "' . self::$table_name . '" WHERE "' . self::$table_name . '"."ParentID" = ?', array($this->ParentID)
             )->value();
         }
-
 
         if (!$this->owner->Slug) {
             $this->owner->Slug = EveryDataStoreHelper::getAvailableSlug(__CLASS__);
@@ -180,11 +184,6 @@ class Menu extends DataObject implements PermissionProvider {
         parent::onAfterDelete();
     }
 
-    /*
-    public function Title(){
-        return EveryDataStoreHelper::_t($this->Title);
-    }
-   */
     public function Badge() {
         if ($this->BadgeEndpoint) {
             $URL = $this->BadgeEndpoint;
@@ -211,6 +210,11 @@ class Menu extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do the given action
      */
     public function canView($member = null) {
+        
+        if($this->RecordSet() && !$this->RecordSet()->canView()){
+            return false;
+        }
+        
         $this->Title = EveryDataStoreHelper::_t($this->Title);
         $member = EveryDataStoreHelper::getMember();
         if ($member) {
@@ -311,4 +315,17 @@ class Menu extends DataObject implements PermissionProvider {
             ],
             );
     }
+    
+    public function niceMobileAppIcons() {
+        $mobileAppIcons = Config::inst()->get('menu_mobile_app_icon');
+        $ret = [];
+        if ($mobileAppIcons) {
+            foreach ($mobileAppIcons as $key => $value) {
+                $ret[$value] = $value;
+            }
+        }
+        
+        return $ret;
+    }
+
 }

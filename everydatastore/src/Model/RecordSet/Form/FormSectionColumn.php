@@ -9,7 +9,7 @@ use EveryDataStore\Model\RecordSet\Form\FormField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines a RecordFormSectionColumn, i.e., a Column within a Section of a Form for creating a RecordSet,
  * as well as its relations.

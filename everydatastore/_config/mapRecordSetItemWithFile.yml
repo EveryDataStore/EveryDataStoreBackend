@@ -1,0 +1,14 @@
+#This logic maps RecordSet fields to corresponding fields in the File DataObject.
+EveryDataStore\Model\RecordSet\RecordSetItem:
+    MapRecordSets:
+        #Put here the RecordSet slug e.g.:
+        c8ef85ed6dae8fc4d66c:
+            MappingFields:
+                UploadField: 'Put here the upload field slug e.g. b2e6a6f1067f965142fd'
+                Created: 'Put here the created date field slug e.g. 54d553fb2f60d334900e'
+                LastEdited: 'Put here the last edited date field slug e.g. d4c1319753c007895493' 
+                CreatedBy: 'Put here the created by field slug e.g. c8b918a540183ed69ade'  
+                UpdatedBy: 'Put here the updated by field slug e.g. 17852d0e6fa4719702c4'                 
+                Name: 'Put here the file name field slug e.g. d1a42c507fe9bee97061'
+                ProtectedURL: 'Put here the file protected URL field slug e.g. 6628a43944c82f34247d'
+                Size: 'Put here the file size field slug e.g. 7dbc0095a6978652ce4d'

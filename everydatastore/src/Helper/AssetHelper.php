@@ -13,7 +13,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\Storage\FileHashingService;
 use SilverStripe\Assets\Storage\AssetStore;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This helper class defines methods to manage assets such as folders and files.
  * It deals with the creation, deletion, upload, naming, navigation , etc. of assets.
@@ -32,41 +32,48 @@ class AssetHelper extends EveryDataStoreHelper {
     public static function createFolder($folderName, $parentFolder = null) {
         $member = self::getMember();
         if ($member) {
-            $Folder = $parentFolder ? Folder::find_or_make(strtolower($parentFolder->Filename . '/' . $folderName)) : Folder::find_or_make(strtolower($folderName));
-            if ($Folder) {
-                $AdministratorsGroup = Group::get()->filter(array('Title' => 'Administrators'))->First();
-                $editorGroups = $member->CurrentDataStore()->Groups()->filter(array(
+            $folder = $parentFolder ? Folder::find_or_make(strtolower($parentFolder->Filename . '/' . $folderName)) : Folder::find_or_make(strtolower($folderName));
+            if ($folder) {
+                self::setAssetPermissions($folder);
+                return $folder;
+            }
+        }
+    }
+    
+    /**
+     * Sets permissions for folder
+     * @param DataObject $folder
+     */
+    public static function setAssetPermissions($asset){
+        $administratorsGroup = Group::get()->filter(array('Title' => 'Administrators'))->First();
+                $editorGroups = self::getCurrentDataStore()->Groups()->filter(array(
                     'Permissions.Code' => array('CREATE_FILE', 'EDIT_FILE', 'VIEW_FILE', 'DELETE_FILE')
                 ));
 
                 if ($editorGroups) {
-                    $Folder->CanEditType = 'OnlyTheseUsers';
+                    $asset->CanEditType = 'OnlyTheseUsers';
                     foreach ($editorGroups as $editorGroup) {
-                        $Folder->EditorGroups()->add($editorGroup);
+                        $asset->EditorGroups()->add($editorGroup);
                     }
                 }
 
-                $viewerGroups = $member->CurrentDataStore()->Groups()->filter(array(
+                $viewerGroups =  self::getCurrentDataStore()->Groups()->filter(array(
                     'Permissions.Code' => array('VIEW_FILE')
                 ));
 
                 if ($viewerGroups) {
-                    $Folder->CanViewType = 'OnlyTheseUsers';
+                    $asset->CanViewType = 'OnlyTheseUsers';
                     foreach ($viewerGroups as $viewerGroup) {
-                        $Folder->ViewerGroups()->add($viewerGroup);
+                        $asset->ViewerGroups()->add($viewerGroup);
                     }
                 }
 
-                if ($AdministratorsGroup) {
-                    $Folder->EditorGroups()->add($AdministratorsGroup);
-                    $Folder->ViewerGroups()->add($AdministratorsGroup);
+                if ($administratorsGroup) {
+                    $asset->EditorGroups()->add($administratorsGroup);
+                    $asset->ViewerGroups()->add($administratorsGroup);
                 }
-
-                return $Folder;
-            }
-        }
     }
-
+    
     /**
      * This function inspects if folder exists
      * @param integer $folderID
@@ -116,14 +123,19 @@ class AssetHelper extends EveryDataStoreHelper {
         $file->FileFilename = $folder->Filename . $filename . '.' . $extension;
         $file->FileHash = $fileHash;
         $fileID = $file->writeWithoutVersion();
-
+        
         $recordSet = Versioned::get_by_stage($fileClass, Versioned::LIVE)->byID($fileID);
         $output = $folder->Filename.substr($fileHash, 0, 10).'/'.$filename . '.' . $extension;
+        $outputFullPath = ASSETS_PATH . '/.protected/'.$output;
         $recordSet = self::createFileFromLocale($recordSet, $base64File, $output);
         $recordSet->writeWithoutVersion();
         $recordSet->publishSingle();
-
-
+        self::chownUserGrop(ASSETS_PATH . '/.protected/'.$output);
+        self::chownUserGrop(dirname(ASSETS_PATH . '/.protected/'.$output, 2));
+        self::chownUserGrop(dirname(ASSETS_PATH . '/.protected/'.$output, 3));
+        self::chownUserGrop(dirname(ASSETS_PATH . '/.protected/'.$output, 4));
+        self::chownUserGrop(dirname(ASSETS_PATH . '/.protected/'.$output, 5));
+                
         $retFile['ParentID'] = $recordSet->ParentID;
         $retFile['ID'] = $recordSet->ID;
         $retFile['Slug'] = $recordSet->Slug;
@@ -148,10 +160,14 @@ class AssetHelper extends EveryDataStoreHelper {
         $extension = explode(';', explode('/', $data[0])[1])[0];
         $tmp_dir = self::createDirIfNotExists(ASSETS_PATH . '/.protected/base64/'.self::getCurrentDataStore()->Title.'/'.$foldername.'/'.date("Ymdhis").'/');
         $output_file = $extension ? $tmp_dir . $filename . '.' . $extension : null;
-        $of = fopen($output_file, 'w');
+         if(!file_exists($tmp_dir)){
+            mkdir($tmp_dir, 0777, true);
+        }
+        $of = file_exists($output_file) ? fopen($output_file, 'w') : fopen($output_file, 'w');
         if($of){
             fwrite($of, base64_decode($data[1]));
             fclose($of);
+            self::chownUserGrop($output_file);
             return $output_file;
         }
     }
@@ -165,8 +181,10 @@ class AssetHelper extends EveryDataStoreHelper {
     public static function createFileFromLocale($fileObject, $localFilePath, $outputFilePath) {
         $fileObject->setFromLocalFile($localFilePath, $outputFilePath);
         $fileObject->publishSingle();
+        self::chownUserGrop($outputFilePath);
         return $fileObject;
     }
+
 
 
     /**
@@ -218,7 +236,9 @@ class AssetHelper extends EveryDataStoreHelper {
     public static function createDirIfNotExists($dirPath) {
         $nicePath = str_replace(' ', '', $dirPath);
         if (!file_exists($nicePath)) {
-            mkdir($nicePath, 0755, true);
+            mkdir($nicePath);
+            chmod($nicePath, 0777);
+            self::chownUserGrop($nicePath);
         }
         return $nicePath;
     }
@@ -746,4 +766,26 @@ class AssetHelper extends EveryDataStoreHelper {
         pclose($io);
         return $size * 1024;
     }
+    
+    /**
+     * This function deletes folder
+     * @param integer $folderID Description
+     */
+    public static function deleteFolder($folderID){
+        $folder = Folder::get()->byID($folderID);
+        if($folder) $folder->delete();
+    }
+    
+    /*
+     * This function sets the system user and group for the given asset
+     */
+    public static function chownUserGrop($path) {
+        if(file_exists($path)){
+           $system_user = Config::inst()->get('SilverStripe\Assets\File', 'set_system_user') ? Config::inst()->get('SilverStripe\Assets\File', 'set_system_user'): 'www-data';
+           $system_group = Config::inst()->get('SilverStripe\Assets\File', 'set_system_group') ? Config::inst()->get('SilverStripe\Assets\File', 'set_system_group'): 'www-data';
+           $command = is_dir($path) ? 'sudo chown '.$system_user.':'.$system_group.' -R '.$path : 'sudo chown '.$system_user.':'.$system_group.' '.$path;
+           exec($command);
+        }
+    }
+
 }

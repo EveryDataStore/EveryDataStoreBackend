@@ -21,7 +21,7 @@ use EveryDataStore\Helper\AssetHelper;
 
 use SilverStripe\Core\ClassInfo;
 
-/** EveryDataStore v1.0
+/** EveryDataStore v1.5
  *
  * This class defines a RecordSet model, its structure in the database, its relations
  * as well as its appearance in the solution.
@@ -178,7 +178,8 @@ class RecordSet extends DataObject implements PermissionProvider {
         }
 
         if ($this->Folder() && $this->Folder()->FolderID > 0) {
-            $this->Folder()->delete();
+            AssetHelper::deleteFolder($this->FolderID);
+            $this->FolderID = 0;
         }
 
         EveryDataStoreHelper::deleteAllVersions($this->ID, self::$table_name);
@@ -201,16 +202,10 @@ class RecordSet extends DataObject implements PermissionProvider {
         return $versionHistory;
     }
 
-    private function createDefaultFolder($member, $folderTitle) {
-        $parentFolder = $member->CurrentDataStore()->Folder();
-        $folder = EveryDataStoreHelper::createFolder($parentFolder, $folderTitle);
-        return $folder ? $folder->ID : 0;
-    }
-
     public function getRecordResultlistFields($getAll = False) {
         $ids = $this->getRecordResultlistFormFieldIDs($getAll);
         if ($ids) {
-            return FormField::get()->filter(array('ID' => $ids));
+            return FormField::get()->filter(array('ID' => $ids))->Sort('Column.Section.Sort ASC,Column.Sort ASC, Sort ASC');
         }
 
     }
@@ -222,13 +217,13 @@ class RecordSet extends DataObject implements PermissionProvider {
                 if ($section->Columns()) {
                     foreach ($section->Columns() as $column) {
                         if ($column->FormFields()) {
-                            foreach ($column->FormFields()->Sort('Column.Section.Sort', 'ASC') as $FormField) {
+                            foreach ($column->FormFields()->Sort("Sort ASC") as $FormField) {
                                 if ($getAll == true) {
-                                    if ($FormField->getActive() && $FormField->ID) {
+                                    if ($FormField->getActive()) {
                                         array_push($ids, $FormField->ID);
                                     }
                                 } else {
-                                    if ($FormField->getActive() && $FormField->showInResultlist() && $FormField->ID) {
+                                    if ($FormField->getActive() && $FormField->showInResultlist()) {
                                         array_push($ids, $FormField->ID);
                                     }
                                 }
@@ -257,7 +252,7 @@ class RecordSet extends DataObject implements PermissionProvider {
         return $this->getRecordResultlistFieldsToArray($getAll = false);
     }
 
-    public function getRecordResultlistFieldsToArray($getAll = false) {
+    public function getRecordResultlistFieldsToArray($getAll = false, $sort = false) {
         $fields = [];
         if (!empty($this->getRecordResultlistFields($getAll))) {
             foreach ($this->getRecordResultlistFields($getAll) as $field) {
@@ -270,7 +265,7 @@ class RecordSet extends DataObject implements PermissionProvider {
             }
         }
 
-        EveryDataStoreHelper::array_sort_by_column($fields, 'Label');
+        if($sort) EveryDataStoreHelper::array_sort_by_column($fields, 'Label');
         return $fields;
     }
 
@@ -281,20 +276,9 @@ class RecordSet extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do the given action
      */
     public function canView($member = null) {
-        /*$member = $member ? $member: Security::getCurrentUser();
-        if ($member) {
-            if ($this->Controller == 'record' && $this->Action != null && $this->ActionID != null) {
-                $recordSetPermission = Permission::get()->filter(array('Code' => $this->ActionID))->first();
-                if ($recordSetPermission) {
-                    if (Permission::checkMember($member, $this->ActionID)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
+        if(($this->Groups()->Count() > 0) && !EveryDataStoreHelper::isMemberInGroups($this->Groups())){
+            return false;
         }
-        */
         return EveryDataStoreHelper::checkPermission(EveryDataStoreHelper::getNicePermissionCode("VIEW", $this), $member);
     }
 
@@ -305,6 +289,9 @@ class RecordSet extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do the given action
      */
     public function canEdit($member = null) {
+        if(($this->Groups()->Count() > 0) && !EveryDataStoreHelper::isMemberInGroups($this->Groups())){
+            return false;
+        }
         return EveryDataStoreHelper::checkPermission(EveryDataStoreHelper::getNicePermissionCode("EDIT", $this), $member);
     }
 
@@ -315,6 +302,9 @@ class RecordSet extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do the given action
      */
     public function canDelete($member = null) {
+        if(($this->Groups()->Count() > 0) && !EveryDataStoreHelper::isMemberInGroups($this->Groups())){
+            return false;
+        }
         return EveryDataStoreHelper::checkPermission(EveryDataStoreHelper::getNicePermissionCode("DELETE", $this), $member);
     }
 
@@ -326,10 +316,10 @@ class RecordSet extends DataObject implements PermissionProvider {
      * @return bool True if the the member is allowed to do this action
      */
     public function canCreate($member = null, $context = []) {
-        if(EveryDataStoreHelper::getCurrentDataStore()->RecordSetAllowedNumber < EveryDataStoreHelper::getCurrentDataStore()->Records()->Count()){
-            return EveryDataStoreHelper::checkPermission(EveryDataStoreHelper::getNicePermissionCode("CREATE", $this), $member);
+        if(($this->Groups()->Count() > 0) && !EveryDataStoreHelper::isMemberInGroups($this->Groups())){
+            return false;
         }
-        return false;
+        return EveryDataStoreHelper::checkPermission(EveryDataStoreHelper::getNicePermissionCode("CREATE", $this), $member);
     }
 
     /**

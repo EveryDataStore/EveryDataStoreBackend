@@ -15,10 +15,6 @@
         <link href="{$BaseHref}/_resources/everydatastore/assets/plugins/animate.css" rel="stylesheet">
         <!-- Custom CSS -->
         <link href="{$BaseHref}/_resources/everydatastore/assets/css/style.css" rel="stylesheet">
-        <!-- color CSS -->
-        <link href="{$BaseHref}/_resources/everydatastore/assets/css/colors/blue.css" id="theme"  rel="stylesheet">
-        <!-- custom CSS -->
-        <link href="{$BaseHref}/_resources/everydatastore/assets/css/custom.css" id="theme"  rel="stylesheet">
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -30,7 +26,7 @@
         <section id="wrapper" class="login-register home-after-login">
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-12 col-lg-12 col-md-12 col-12">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-12" style="margin-top: 30px; margin-bottom: 30px;">
                         <a href="{$BaseHref}/Security/login?BackURL={$BaseHref}/" class="text-center w-100 db"><img src="{$BaseHref}/_resources/everydatastore/assets/img/logo.png" alt="Home"></a>
                     </div>
                     <div class="col-xl-12 col-lg-12 col-md-12 col-12 every-data-store-data">
