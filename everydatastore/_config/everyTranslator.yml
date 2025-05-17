@@ -1,0 +1,2 @@
+EveryTranslator\Model\EveryTranslator:
+    Google_Translate_Key: 'Put here your google api key'

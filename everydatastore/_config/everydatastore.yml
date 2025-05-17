@@ -48,13 +48,13 @@ cron_member:
     password: 'mypassword'
 # SilverStripe Admin-E-Mail
 SilverStripe\Control\Email\Email:
-  admin_email: 'admin@example.com'
+  admin_email: 'admin@everydatastore.com'
 # defines the life time of a recordset item in seconds
 draft_recordset_item_life_time: 11
-everydatastore_tmp_dir_path: 'full_path_to_your_project_directory/tmp'
+demo_data_file_path: '/var/www/app/everydatastore/demodata/demo.json'
+everydatastore_tmp_dir_path: '/var/www/app/tmp'
 EveryDataStore\Model\RecordSet\RecordSetItem:
-#PermissionRecordSets define which RecordSets allow RecordSetItems to be viewed (canView) only by their respective owners.
-    PermissionRecordSets: ['RecordSetSlu_1', 'RecordSetSlu_2']
+    PermissionRecordSets: ['6f8a4753d6d4e78de482', '6fc86f8149cc9beef4a9', '55d7b3980f8570628812', 'f90aa41bbbb80ded74c3']
 #Cors Config
 cors_config:
     Allow-Domains: '*'

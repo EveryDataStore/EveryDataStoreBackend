@@ -82,7 +82,7 @@ class RecordSetItemData extends DataObject {
       $retValue = $this->Value;
       $textFieldType = $this->FormField()->getTextFieldType();
 
-         // check if value is a number value
+        // check if value is a number
         if(
                 $textFieldType == 'money' ||
                 $textFieldType == 'unit' ||
@@ -108,7 +108,7 @@ class RecordSetItemData extends DataObject {
         }
         
         
-        if($this->FolderID > 0 &&  $textFieldType == 'uploadfield'){
+        if($this->FolderID > 0 &&  $this->FormField()->getTypeSlug() == 'uploadfield'){
                return RecordSetItemDataHelper::getUploadFieldValue($this);
         } 
         

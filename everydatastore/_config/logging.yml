@@ -9,13 +9,13 @@ SilverStripe\Core\Injector\Injector:
   LogFileHandler:
     class: Monolog\Handler\StreamHandler
     constructor:
-      - "full_path_to_your_project_directory/log/silverstripe.log"
+      - "/var/www/app/log/silverstripe.log"
   MailHandler:
       class: Monolog\Handler\NativeMailerHandler
       constructor:
-        - error@example.com
+        - office@everydatastore.com
         - There was an error on your test site
-        - error@example.com
+        - office@everydatastore.com
         - error
         - info
       properties:
