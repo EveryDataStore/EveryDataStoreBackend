@@ -121,11 +121,10 @@ class RecordSetItemData extends DataObject {
         if(is_array(unserialize($this->Value))){
             $retValue = unserialize($this->Value);
         }
-        /*
+        
         if(EveryTranslatorHelper::isTranslatableRecordSet($this->RecordSetItem()->RecordSet()->Slug)){
             $retValue = EveryTranslatorHelper::_t($retValue, true);
         }
-        */
         
         return  $retValue;
       }

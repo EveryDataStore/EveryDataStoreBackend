@@ -13,4 +13,7 @@ silverstripe-cache/*
 !silverstripe-cache/.gitkeep
 .DS_Store
 .gitmodules
+log/*
+!log/.gitkeep
+
 nbproject/
