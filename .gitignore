@@ -15,5 +15,5 @@ silverstripe-cache/*
 .gitmodules
 log/*
 !log/.gitkeep
-
-nbproject/
+everydatastore/_config
+nbprojecyy
